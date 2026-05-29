@@ -300,7 +300,6 @@ export default function TemplateGallery() {
       .then(r => r.json())
       .then(data => {
         if (data.template_id) setCurrentTemplateId(data.template_id);
-        if (data.slug) setWeddingSlug(data.slug);
       })
       .catch(() => {});
   }, [weddingId]);
