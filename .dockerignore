@@ -1,0 +1,38 @@
+# ══════════════════════════════════════════════════════════════
+# Docker Ignore — Root
+# ══════════════════════════════════════════════════════════════
+
+# Git
+.git
+.gitignore
+
+# IDE
+.vscode
+.idea
+
+# Docs
+*.md
+docs/
+
+# Agent workspaces (not needed in containers)
+devops/
+agents/
+
+# Docker files (not needed inside containers)
+Dockerfile
+docker-compose.yml
+.dockerignore
+
+# Node modules (rebuilt inside containers)
+node_modules
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Env files
+.env
+.env*.local

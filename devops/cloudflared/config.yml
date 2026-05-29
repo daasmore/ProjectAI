@@ -1,0 +1,27 @@
+# ══════════════════════════════════════════════════════════════
+# Cloudflare Tunnel Config — Wedding Invitation SaaS
+# ══════════════════════════════════════════════════════════════
+#
+# Setup:
+#   1. Install cloudflared: https://developers.cloudflare.com/cloudflare-one/connections/connect-networks/
+#   2. Authenticate: cloudflared tunnel login
+#   3. Create tunnel: cloudflared tunnel create wedding-saas
+#   4. Copy tunnel ID and token from ~/.cloudflared/
+#   5. Update this file with your tunnel ID
+#   6. Run: cloudflared tunnel run wedding-saas
+#
+# Or use Docker:
+#   docker run cloudflare/cloudflared:latest tunnel --no-autoupdate run --token <TOKEN>
+
+tunnel: <YOUR_TUNNEL_ID>
+credentials-file: /root/.cloudflared/<YOUR_TUNNEL_ID>.json
+
+ingress:
+  # Frontend + API via Nginx
+  - hostname: wedding.yourdomain.com
+    service: http://nginx:80
+    originRequest:
+      noTLSVerify: true
+
+  # Catch-all
+  - service: http_status:404

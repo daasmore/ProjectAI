@@ -1,0 +1,92 @@
+# ══════════════════════════════════════════════════════════════
+# Docker Compose — Wedding Invitation SaaS (Production)
+# ══════════════════════════════════════════════════════════════
+#
+# Usage:
+#   docker compose up -d                  # Start all services
+#   docker compose down                   # Stop all services
+#   docker compose logs -f                # Tail logs
+#   docker compose up -d --build          # Rebuild & restart
+#
+# Single URL: http://localhost (or your domain)
+#   /          → Next.js frontend
+#   /api/*     → Express backend
+#   /health    → Backend healthcheck
+#
+version: "3.9"
+
+services:
+  # ── Nginx Reverse Proxy ────────────────────────────────────
+  nginx:
+    build:
+      context: ./devops/nginx
+      dockerfile: Dockerfile
+    ports:
+      - "80:80"
+      - "443:443"
+    depends_on:
+      frontend:
+        condition: service_healthy
+      backend:
+        condition: service_healthy
+    volumes:
+      - nginx_logs:/var/log/nginx
+    restart: unless-stopped
+    networks:
+      - wedding-net
+
+  # ── Frontend (Next.js) ─────────────────────────────────────
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    expose:
+      - "3000"
+    environment:
+      - NODE_ENV=production
+      - NEXT_PUBLIC_API_URL=/api/v1
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3000/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 15s
+    networks:
+      - wedding-net
+
+  # ── Backend (Node.js/Express + SQLite) ─────────────────────
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    expose:
+      - "3001"
+    environment:
+      - NODE_ENV=production
+      - PORT=3001
+      - DB_PATH=/app/data/wedding.db
+      - FRONTEND_URL=http://localhost
+    volumes:
+      - backend_data:/app/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3001/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 15s
+    networks:
+      - wedding-net
+
+# ── Networks ──────────────────────────────────────────────────
+networks:
+  wedding-net:
+    driver: bridge
+
+# ── Volumes ───────────────────────────────────────────────────
+volumes:
+  backend_data:
+    driver: local
+  nginx_logs:
+    driver: local
