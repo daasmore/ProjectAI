@@ -19,18 +19,15 @@ interface Template {
 }
 
 const getWeddingId = () => {
-  // Try URL param first
   if (typeof window !== "undefined") {
     const params = new URLSearchParams(window.location.search);
     const id = params.get("wedding_id");
     if (id) return id;
-    // Try localStorage
     const saved = localStorage.getItem("wedding_id");
     if (saved) return saved;
   }
   return "";
 };
-const weddingId = getWeddingId();
 
 const categoryLabels: Record<string, string> = {
   classic: "🎩 Classic",
@@ -52,8 +49,10 @@ export default function TemplateGallery() {
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [error, setError] = useState("");
+  const [weddingId, setWeddingId] = useState("");
 
   useEffect(() => {
+    setWeddingId(getWeddingId());
     // Fetch templates
     fetch("/api/v1/templates")
       .then((r) => r.json())
@@ -111,7 +110,7 @@ export default function TemplateGallery() {
       <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-neutral-100">
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <Link href="/admin" className="p-2 hover:bg-neutral-50 rounded-full transition-colors">
+            <Link href={weddingId ? `/admin?wedding_id=${weddingId}` : "/admin"} className="p-2 hover:bg-neutral-50 rounded-full transition-colors">
               <ArrowLeft className="w-5 h-5 text-neutral-600" />
             </Link>
             <div>
@@ -227,31 +226,30 @@ function TemplateCard({
     >
       {/* Color Preview */}
       <div className="relative h-48 overflow-hidden">
+        <div className="absolute inset-0" style={{ background: template.secondary_color }} />
         <div
           className="absolute inset-0"
-          style={{ background: `linear-gradient(135deg, ${template.primary_color}, ${template.secondary_color})` }}
+          style={{ background: `linear-gradient(180deg, ${template.primary_color}33 0%, ${template.primary_color}00 100%)` }}
         />
-        <div
-          className="absolute bottom-0 left-0 right-0 h-1/3"
-          style={{ backgroundColor: template.accent_color }}
-        />
-        {/* Fake decorative elements */}
+        <div className="absolute bottom-0 left-0 right-h-2/3" style={{ background: template.accent_color, opacity: 0.9 }} />
+        {/* Mini invitation preview */}
         <div className="absolute inset-0 flex flex-col items-center justify-center text-center p-4">
+          <div className="w-8 h-px mb-3" style={{ backgroundColor: template.primary_color }} />
           <div
-            className="text-sm tracking-widest uppercase mb-1 opacity-80"
-            style={{ color: template.secondary_color }}
+            className="text-[9px] tracking-[0.2em] uppercase mb-2"
+            style={{ color: `${template.primary_color}99` }}
           >
             The Wedding of
           </div>
           <div
-            className="text-xl font-serif mb-1"
+            className="text-base font-serif mb-1 leading-tight"
             style={{ color: template.primary_color, fontFamily: template.font_family }}
           >
             Bride & Groom
           </div>
-          <div className="w-12 h-px my-2" style={{ backgroundColor: template.primary_color }} />
-          <div className="text-xs opacity-60" style={{ color: template.secondary_color }}>
-            Sabtu, 15 Maret 2026
+          <div className="w-6 h-px my-1.5" style={{ backgroundColor: template.primary_color, opacity: 0.3 }} />
+          <div className="text-[8px] tracking-wider" style={{ color: `${template.secondary_color}cc` }}>
+            15 Maret 2026
           </div>
         </div>
 

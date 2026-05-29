@@ -27,11 +27,14 @@ export default function AdminPage() {
   const [saved, setSaved] = useState(false);
   const [config, setConfig] = useState<Record<string, unknown> | null>(null);
   const [previewKey, setPreviewKey] = useState(0);
+  const [weddingId, setWeddingId] = useState("");
 
   // Load config on mount
   useEffect(() => {
+    const id = localStorage.getItem("wedding_id");
+    if (id) setWeddingId(id);
     setLoading(true);
-    fetch("/api/v1/weddings/04bf40ea-153f-4378-a896-8889f56f9dce/config")
+    fetch(`/api/v1/weddings/${weddingId || "04bf40ea-153f-4378-a896-8889f56f9dce"}/config`)
       .then((r) => r.json())
       .then((data) => setConfig(data))
       .catch(() => null)
@@ -42,7 +45,7 @@ export default function AdminPage() {
     setSaving(true);
     setSaved(false);
     try {
-      const res = await fetch("/api/v1/weddings/04bf40ea-153f-4378-a896-8889f56f9dce/config", {
+      const res = await fetch(`/api/v1/weddings/${weddingId || "04bf40ea-153f-4378-a896-8889f56f9dce"}/config`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(sectionData),
@@ -154,7 +157,7 @@ export default function AdminPage() {
                 </p>
               </div>
               <Link
-                href="/templates"
+                href={`/templates?wedding_id=${weddingId}`}
                 className="inline-flex items-center gap-2 px-6 py-3 bg-neutral-800 text-white text-xs tracking-wider uppercase hover:bg-neutral-700 transition-colors"
               >
                 <Palette className="w-4 h-4" />
