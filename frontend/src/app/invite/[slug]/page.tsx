@@ -33,19 +33,31 @@ function formatTime(t: string) {
   return t;
 }
 
-export default function InvitePage() {
+export default function InvitePage({ params }: { params: { slug: string } }) {
   const [couple, setCouple] = useState(mockCouple);
   const [loading, setLoading] = useState(true);
   const [isOpened, setIsOpened] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
   const [activeTemplateId, setActiveTemplateId] = useState("");
+  
   const [tplColors, setTplColors] = useState<{primary: string; secondary: string; accent: string; font: string} | null>(null);
 
   useEffect(() => {
     let cancelled = false;
     (async () => {
       try {
-        const res = await fetch("/api/v1/weddings/04bf40ea-153f-4378-a896-8889f56f9dce/config");
+        // First, get wedding by slug to get the ID
+        const wRes = await fetch(`/api/v1/weddings/slug/${params.slug}`);
+        const wData = await wRes.json();
+        if (cancelled) return;
+
+        if (!wData.id) {
+          setLoading(false);
+          return;
+        }
+
+        // Then get full config by ID
+        const res = await fetch(`/api/v1/weddings/${wData.id}/config`);
         const data = await res.json();
         if (cancelled) return;
 
