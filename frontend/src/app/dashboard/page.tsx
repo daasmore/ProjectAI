@@ -225,11 +225,12 @@ export default function DashboardPage() {
 
                 <div className="flex gap-2">
                   <Link
-                    href={`/admin/${w.id}`}
-                    className="flex-1 px-3 py-2 bg-neutral-800 text-white text-xs text-center tracking-wider hover:bg-neutral-700 transition-colors flex items-center justify-center gap-1"
-                  >
-                    <Settings className="w-3 h-3" /> Edit
-                  </Link>
+                  href={`/admin/${w.id}`}
+                  onClick={() => localStorage.setItem("wedding_id", w.id)}
+                  className="flex-1 px-3 py-2 bg-neutral-800 text-white text-xs text-center tracking-wider hover:bg-neutral-700 transition-colors flex items-center justify-center gap-1"
+                >
+                  <Settings className="w-3 h-3" /> Edit
+                </Link>
                   <Link
                     href={`/invite/${w.slug}`}
                     className="flex-1 px-3 py-2 border border-neutral-200 text-neutral-600 text-xs text-center tracking-wider hover:bg-neutral-50 transition-colors flex items-center justify-center gap-1"

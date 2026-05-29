@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Save, Users, Calendar, Clock, MapPin, Loader2, CheckCircle, Upload, Sparkles, Palette } from "lucide-react";
@@ -152,13 +153,13 @@ export default function AdminPage() {
                   Preview template akan ditampilkan sebelum Anda memilih.
                 </p>
               </div>
-              <a
-                href="/templates"
+              <Link
+                href={`/templates?wedding_id=04bf40ea-153f-4378-a896-8889f56f9dce`}
                 className="inline-flex items-center gap-2 px-6 py-3 bg-neutral-800 text-white text-xs tracking-wider uppercase hover:bg-neutral-700 transition-colors"
               >
                 <Palette className="w-4 h-4" />
                 Buka Gallery Template Lengkap
-              </a>
+              </Link>
             </div>
           )}
         </div>

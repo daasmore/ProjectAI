@@ -18,7 +18,19 @@ interface Template {
   is_premium: number;
 }
 
-const weddingId = "04bf40ea-153f-4378-a896-8889f56f9dce";
+const getWeddingId = () => {
+  // Try URL param first
+  if (typeof window !== "undefined") {
+    const params = new URLSearchParams(window.location.search);
+    const id = params.get("wedding_id");
+    if (id) return id;
+    // Try localStorage
+    const saved = localStorage.getItem("wedding_id");
+    if (saved) return saved;
+  }
+  return "";
+};
+const weddingId = getWeddingId();
 
 const categoryLabels: Record<string, string> = {
   classic: "🎩 Classic",
