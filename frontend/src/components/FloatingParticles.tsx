@@ -21,30 +21,32 @@ export default function FloatingParticles({ count = 20 }: { count?: number }) {
       id: i,
       x: Math.random() * 100,
       y: Math.random() * 100,
-      size: 2 + Math.random() * 4,
-      duration: 3 + Math.random() * 4,
+      size: 3 + Math.random() * 6,
+      duration: 4 + Math.random() * 6,
       delay: Math.random() * 3,
-      opacity: 0.2 + Math.random() * 0.4,
+      opacity: 0.15 + Math.random() * 0.35,
     }));
     setParticles(newParticles);
   }, [count]);
 
   return (
-    <div className="absolute inset-0 overflow-hidden pointer-events-none">
+    <div className="absolute inset-0 overflow-hidden pointer-events-none z-20">
       {particles.map((p) => (
         <motion.div
           key={p.id}
-          className="absolute rounded-full bg-champagne-400"
+          className="absolute rounded-full"
           style={{
             left: `${p.x}%`,
             top: `${p.y}%`,
             width: p.size,
             height: p.size,
+            backgroundColor: `rgba(201, 169, 110, ${p.opacity})`,
           }}
           animate={{
             y: [0, -30, 0],
             x: [0, 10, -10, 0],
-            opacity: [p.opacity, p.opacity * 1.5, p.opacity],
+            opacity: [p.opacity, p.opacity * 1.8, p.opacity],
+            scale: [1, 1.3, 1],
           }}
           transition={{
             duration: p.duration,
