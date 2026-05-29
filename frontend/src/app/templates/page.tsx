@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowLeft, Check, Loader2, Sparkles, Eye } from "lucide-react";
+import { ArrowLeft, Check, Loader2, Heart, Calendar, Clock, MapPin, ChevronDown, MessageSquare } from "lucide-react";
 import Link from "next/link";
 
 interface Template {
@@ -15,6 +15,7 @@ interface Template {
   secondary_color: string;
   accent_color: string;
   font_family: string;
+  body_font?: string;
   is_premium: number;
 }
 
@@ -37,13 +38,242 @@ const categoryLabels: Record<string, string> = {
   rustic: "🪵 Rustic",
   indonesia: "🇮🇩 Suku Indonesia",
 };
-
 const categoryOrder = ["indonesia", "classic", "modern", "nature", "romantic", "rustic"];
 
+/* ═══════════════════════════════════════════════════════════════════════════ 
+   FULL INVITATION PREVIEW — Renders the actual invitation with this template
+   ═══════════════════════════════════════════════════════════════════════════ */
+function FullInvitePreview({ template, onClose, onSelect, saving }: {
+  template: Template;
+  onClose: () => void;
+  onSelect: () => void;
+  saving: boolean;
+}) {
+  const P = template.primary_color;
+  const S = template.secondary_color;
+  const A = template.accent_color;
+  const FF = template.font_family || "serif";
+  const FB = template.body_font || "sans-serif";
+
+  return (
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      className="fixed inset-0 z-[100] bg-black/70 overflow-y-auto"
+      onClick={onClose}
+    >
+      <div className="min-h-screen py-8 px-4 flex flex-col items-center justify-start" onClick={e => e.stopPropagation()}>
+        {/* Top bar */}
+        <div className="w-full max-w-lg flex items-center justify-between mb-4 sticky top-0 z-10">
+          <button onClick={onClose} className="px-4 py-2 bg-white/90 backdrop-blur text-neutral-700 text-xs tracking-wider uppercase">
+            ← Kembali
+          </button>
+          <button
+            onClick={onSelect}
+            disabled={saving}
+            className="px-6 py-2 text-white text-xs tracking-wider uppercase disabled:opacity-50 transition-opacity"
+            style={{ backgroundColor: P }}
+          >
+            {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : "Pilih Template Ini"}
+          </button>
+        </div>
+
+        {/* ═══ THE FULL INVITATION ═══ */}
+        <div className="w-full max-w-lg bg-white shadow-2xl overflow-hidden" style={{ fontFamily: FB }}>
+
+          {/* COVER */}
+          <div className="relative min-h-[420px] flex items-center justify-center"
+            style={{ background: `linear-gradient(160deg, ${S} 0%, ${A} 50%, ${S} 100%)` }}>
+            {/* Subtle pattern overlay */}
+            <div className="absolute inset-0 opacity-5" style={{
+              backgroundImage: `radial-gradient(${P} 1px, transparent 1px)`,
+              backgroundSize: '24px 24px'
+            }} />
+            <div className="text-center px-8 relative z-10">
+              <div className="w-10 h-px mx-auto mb-6" style={{ background: P }} />
+              <p className="text-[10px] tracking-[0.35em] uppercase mb-4" style={{ color: `${P}88` }}>
+                The Wedding Of
+              </p>
+              <h1 className="text-3xl font-light leading-tight" style={{ color: P, fontFamily: FF }}>
+                Nama Mempelai Wanita
+              </h1>
+              <div className="flex items-center justify-center gap-3 my-3">
+                <div className="h-px w-6" style={{ background: `${P}44` }} />
+                <span className="text-base italic" style={{ color: P }}>&</span>
+                <div className="h-px w-6" style={{ background: `${P}44` }} />
+              </div>
+              <h1 className="text-3xl font-light leading-tight" style={{ color: P, fontFamily: FF }}>
+                Nama Mempelai Pria
+              </h1>
+              <p className="text-xs mt-6 tracking-wide" style={{ color: `${P}cc` }}>
+                Sabtu, 15 Maret 2027
+              </p>
+              <p className="text-[10px] mt-1" style={{ color: `${P}66` }}>
+                Gedung Pernikahan, Jakarta
+              </p>
+              <div className="mt-8">
+                <span className="inline-flex items-center gap-2 px-6 py-2.5 border text-[10px] tracking-wider uppercase"
+                  style={{ borderColor: `${P}44`, color: P }}>
+                  <Heart className="w-3 h-3" /> Buka Undangan
+                </span>
+              </div>
+            </div>
+          </div>
+
+          {/* QUOTE */}
+          <div className="py-16 px-8 text-center" style={{ background: S }}>
+            <div className="w-6 h-px mx-auto mb-6" style={{ background: `${P}33` }} />
+            <blockquote className="text-sm leading-relaxed italic" style={{ color: `${P}cc`, fontFamily: FF }}>
+              &ldquo;Dan di antara tanda-tanda (kebesaran)-Nya ialah Dia menciptakan pasangan-pasangan untukmu dari jenismu sendiri, agar kamu cenderung dan merasa tenteram kepadanya, dan Dia menjadikan di antarasimu rasa kasih sayang.&rdquo;
+            </blockquote>
+            <p className="text-[10px] tracking-wider mt-4 uppercase" style={{ color: `${P}66` }}>
+              — QS. Ar-Rum : 21
+            </p>
+          </div>
+
+          {/* COUPLE */}
+          <div className="py-16 px-8" style={{ background: A }}>
+            <div className="text-center mb-10">
+              <p className="text-[9px] tracking-[0.3em] uppercase mb-2" style={{ color: `${P}66` }}>
+                Yang Berbahagia
+              </p>
+              <h2 className="text-xl font-light" style={{ color: P, fontFamily: FF }}>
+                Mempelai
+              </h2>
+            </div>
+            <div className="grid grid-cols-2 gap-8">
+              {[{ name: "Nama Wanita", label: "Putri dari" }, { name: "Nama Pria", label: "Putra dari" }].map((p, i) => (
+                <div key={i} className="text-center">
+                  <div className="w-20 h-20 mx-auto mb-4 rounded-full flex items-center justify-center text-lg font-light"
+                    style={{ background: `${P}10`, color: P, fontFamily: FF }}>
+                    {p.name.charAt(0)}
+                  </div>
+                  <h3 className="text-base font-light mb-1" style={{ color: P, fontFamily: FF }}>{p.name}</h3>
+                  <p className="text-[9px] tracking-wider uppercase" style={{ color: `${P}55` }}>{p.label}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* EVENTS */}
+          <div className="py-16 px-8" style={{ background: S }}>
+            <div className="text-center mb-10">
+              <p className="text-[9px] tracking-[0.3em] uppercase mb-2" style={{ color: `${P}66` }}>
+                Acara
+              </p>
+              <h2 className="text-xl font-light" style={{ color: P, fontFamily: FF }}>
+                Detail Pernikahan
+              </h2>
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              {[{ title: "Akad Nikah", time: "09:00 WIB" }, { title: "Resepsi", time: "11:00 WIB" }].map((evt, i) => (
+                <div key={i} className="p-6 text-center" style={{ background: A, border: `1px solid ${P}11` }}>
+                  <p className="text-[9px] tracking-[0.2em] uppercase mb-3" style={{ color: `${P}88` }}>{evt.title}</p>
+                  <div className="w-4 h-px mx-auto mb-3" style={{ background: `${P}22` }} />
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-center gap-1.5">
+                      <Calendar className="w-3 h-3" style={{ color: `${P}55` }} />
+                      <span className="text-[10px]" style={{ color: `${P}aa` }}>15 Maret 2027</span>
+                    </div>
+                    <div className="flex items-center justify-center gap-1.5">
+                      <Clock className="w-3 h-3" style={{ color: `${P}55` }} />
+                      <span className="text-[10px]" style={{ color: `${P}aa` }}>{evt.time}</span>
+                    </div>
+                    <div className="flex items-center justify-center gap-1.5">
+                      <MapPin className="w-3 h-3" style={{ color: `${P}55` }} />
+                      <span className="text-[10px]" style={{ color: `${P}aa` }}>Gedung, Jakarta</span>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* COUNTDOWN */}
+          <div className="py-12 px-8 text-center" style={{ background: A }}>
+            <p className="text-[9px] tracking-[0.3em] uppercase mb-6" style={{ color: `${P}66` }}>
+              Menghitung Hari
+            </p>
+            <div className="flex items-center justify-center gap-6">
+              {[{ v: "120", l: "Hari" }, { v: "08", l: "Jam" }, { v: "30", l: "Menit" }, { v: "45", l: "Detik" }].map((c, i) => (
+                <div key={i}>
+                  <div className="text-2xl font-light" style={{ color: P, fontFamily: FF }}>{c.v}</div>
+                  <div className="text-[8px] tracking-wider uppercase mt-1" style={{ color: `${P}55` }}>{c.l}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* GALLERY */}
+          <div className="py-12 px-8" style={{ background: S }}>
+            <div className="text-center mb-8">
+              <p className="text-[9px] tracking-[0.3em] uppercase mb-2" style={{ color: `${P}66` }}>Galeri</p>
+              <h2 className="text-xl font-light" style={{ color: P, fontFamily: FF }}>Momen Kami</h2>
+            </div>
+            <div className="grid grid-cols-3 gap-1.5">
+              {[0,1,2,3,4,5].map(i => (
+                <div key={i} className="aspect-square" style={{ background: `${P}15`, border: `1px solid ${P}11` }}>
+                  <div className="w-full h-full flex items-center justify-center" style={{ color: `${P}33` }}>
+                    <Heart className="w-4 h-4" />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* RSVP */}
+          <div className="py-12 px-8" style={{ background: A }}>
+            <div className="text-center mb-6">
+              <MessageSquare className="w-4 h-4 mx-auto mb-2" style={{ color: `${P}44` }} />
+              <p className="text-[9px] tracking-[0.3em] uppercase mb-2" style={{ color: `${P}66` }}>RSVP</p>
+              <h2 className="text-xl font-light" style={{ color: P, fontFamily: FF }}>Konfirmasi Kehadiran</h2>
+            </div>
+            <div className="p-4" style={{ background: S, border: `1px solid ${P}11` }}>
+              <div className="space-y-3">
+                <div className="h-8 w-full" style={{ background: `${P}0a`, border: `1px solid ${P}15` }} />
+                <div className="h-8 w-full" style={{ background: `${P}0a`, border: `1px solid ${P}15` }} />
+                <div className="h-20 w-full" style={{ background: `${P}0a`, border: `1px solid ${P}15` }} />
+                <div className="h-8 w-full flex items-center justify-center text-[10px] tracking-wider uppercase"
+                  style={{ background: P, color: A }}>
+                  Kirim RSVP
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* FOOTER */}
+          <div className="py-12 px-6 text-center" style={{ background: P }}>
+            <Heart className="w-4 h-4 mx-auto mb-3" style={{ color: `${A}44` }} />
+            <h3 className="text-base font-light mb-1" style={{ color: A, fontFamily: FF }}>
+              Nama Wanita & Nama Pria
+            </h3>
+            <p className="text-[9px] tracking-wider mb-4" style={{ color: `${A}66` }}>
+              15 Maret 2027
+            </p>
+            <div className="w-6 h-px mx-auto mb-4" style={{ background: `${A}22` }} />
+            <p className="text-[8px] tracking-[0.2em] uppercase" style={{ color: `${A}44` }}>
+              Made with love
+            </p>
+          </div>
+
+        </div>
+        {/* End of full invitation preview */}
+
+        {/* bottom spacer for scroll */}
+        <div className="h-8 flex-shrink-0" />
+      </div>
+    </motion.div>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════ 
+   MAIN PAGE
+   ═══════════════════════════════════════════════════════════════════════════ */
 export default function TemplateGallery() {
   const [templates, setTemplates] = useState<Template[]>([]);
-  const [currentTemplateId, setCurrentTemplateId] = useState<string>("");
-  const [activeCategory, setActiveCategory] = useState<string>("all");
+  const [currentTemplateId, setCurrentTemplateId] = useState("");
+  const [activeCategory, setActiveCategory] = useState("all");
   const [previewTemplate, setPreviewTemplate] = useState<Template | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -53,32 +283,33 @@ export default function TemplateGallery() {
 
   useEffect(() => {
     setWeddingId(getWeddingId());
-    // Fetch templates
     fetch("/api/v1/templates")
-      .then((r) => r.json())
-      .then((data) => {
+      .then(r => r.json())
+      .then(data => {
         if (data.templates) setTemplates(data.templates);
       })
       .catch(() => setError("Gagal memuat template"))
       .finally(() => setLoading(false));
-
-    // Fetch current wedding template
-    fetch(`/api/v1/weddings/${weddingId}/config`)
-      .then((r) => r.json())
-      .then((data) => {
-        if (data.wedding?.template_id) setCurrentTemplateId(data.wedding.template_id);
-      })
-      .catch(() => {});
   }, []);
 
-  const filteredTemplates =
-    activeCategory === "all"
-      ? templates
-      : templates.filter((t) => t.category === activeCategory);
+  // After templates loaded, fetch current wedding's template
+  useEffect(() => {
+    if (!weddingId) return;
+    fetch(`/api/v1/weddings/${weddingId}/config`)
+      .then(r => r.json())
+      .then(data => {
+        if (data.template_id) setCurrentTemplateId(data.template_id);
+      })
+      .catch(() => {});
+  }, [weddingId]);
 
-  const categories = ["all", ...categoryOrder.filter((c) => templates.some((t) => t.category === c))];
+  const filtered = activeCategory === "all"
+    ? templates
+    : templates.filter(t => t.category === activeCategory);
 
-  const handleSelectTemplate = async (templateId: string) => {
+  const categories = ["all", ...categoryOrder.filter(c => templates.some(t => t.category === c))];
+
+  const handleSelect = async (templateId: string) => {
     setSaving(true);
     setSaved(false);
     setError("");
@@ -92,10 +323,9 @@ export default function TemplateGallery() {
       if (data.success) {
         setCurrentTemplateId(templateId);
         setSaved(true);
-        localStorage.setItem("wedding_id", weddingId);
-        setTimeout(() => setSaved(false), 2000);
+        setTimeout(() => setSaved(false), 3000);
       } else {
-        setError(data.error || "Gagal menyimpan template");
+        setError(data.error || "Gagal menyimpan");
       }
     } catch {
       setError("Gagal menyimpan template");
@@ -110,18 +340,19 @@ export default function TemplateGallery() {
       <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-neutral-100">
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <Link href={weddingId ? `/admin?wedding_id=${weddingId}` : "/admin"} className="p-2 hover:bg-neutral-50 rounded-full transition-colors">
+            <Link href={weddingId ? `/admin?wedding_id=${weddingId}` : "/admin"}
+              className="p-2 hover:bg-neutral-50 rounded-full transition-colors">
               <ArrowLeft className="w-5 h-5 text-neutral-600" />
             </Link>
             <div>
               <h1 className="text-lg font-serif font-light text-neutral-800">Pilih Template</h1>
-              <p className="text-xs text-neutral-400">Pilih desain undangan pernikahan Anda</p>
+              <p className="text-xs text-neutral-400">Preview undangan sebelum memilih</p>
             </div>
           </div>
           {saved && (
-            <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
+            <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }}
               className="flex items-center gap-2 text-green-600 text-sm">
-              <Check className="w-4 h-4" /> Template disimpan
+              <Check className="w-4 h-4" /> Template disimpan!
             </motion.div>
           )}
         </div>
@@ -130,30 +361,33 @@ export default function TemplateGallery() {
       {/* Category Filter */}
       <div className="max-w-7xl mx-auto px-6 py-4">
         <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
-          {categories.map((cat) => (
-            <button
-              key={cat}
-              onClick={() => setActiveCategory(cat)}
+          {categories.map(cat => (
+            <button key={cat} onClick={() => setActiveCategory(cat)}
               className={`px-4 py-2 text-xs tracking-wider whitespace-nowrap transition-all ${
                 activeCategory === cat
                   ? "bg-neutral-800 text-white"
                   : "bg-white text-neutral-500 hover:bg-neutral-100 border border-neutral-200"
-              }`}
-            >
+              }`}>
               {cat === "all" ? "🎨 Semua" : categoryLabels[cat] || cat}
             </button>
           ))}
         </div>
       </div>
 
-      {/* Error */}
+      {!weddingId && (
+        <div className="max-w-7xl mx-auto px-6 mb-4">
+          <div className="bg-amber-50 text-amber-700 text-sm px-4 py-3 rounded">
+            ⚠️ Tidak ada undangan yang dipilih. Silakan buat undangan terlebih dahulu di Dashboard.
+          </div>
+        </div>
+      )}
       {error && (
         <div className="max-w-7xl mx-auto px-6 mb-4">
           <div className="bg-red-50 text-red-600 text-sm px-4 py-3 rounded">{error}</div>
         </div>
       )}
 
-      {/* Template Grid */}
+      {/* Grid — horizontal scroll cards */}
       <main className="max-w-7xl mx-auto px-6 pb-20">
         {loading ? (
           <div className="flex items-center justify-center py-20 gap-3">
@@ -161,33 +395,92 @@ export default function TemplateGallery() {
             <span className="text-neutral-400">Memuat template...</span>
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            <AnimatePresence mode="popLayout">
-              {filteredTemplates.map((tmpl, i) => (
-                <TemplateCard
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+            {filtered.map((tmpl, i) => {
+              const isActive = currentTemplateId === tmpl.id;
+              return (
+                <motion.div
                   key={tmpl.id}
-                  template={tmpl}
-                  index={i}
-                  isSelected={currentTemplateId === tmpl.id}
-                  onSelect={() => handleSelectTemplate(tmpl.id)}
-                  onPreview={() => setPreviewTemplate(tmpl)}
-                  saving={saving}
-                />
-              ))}
-            </AnimatePresence>
+                  initial={{ opacity: 0, y: 15 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: i * 0.04 }}
+                  className={`relative bg-white border-2 cursor-pointer transition-all hover:shadow-lg ${
+                    isActive ? "border-neutral-800 shadow-md" : "border-neutral-100 hover:border-neutral-300"
+                  }`}
+                  onClick={() => setPreviewTemplate(tmpl)}
+                >
+                  {/* Thumbnail — mini invitation */}
+                  <div className="relative h-56 overflow-hidden">
+                    <div className="absolute inset-0" style={{ background: tmpl.secondary_color }} />
+                    <div className="absolute inset-0" style={{
+                      background: `linear-gradient(180deg, ${tmpl.primary_color}22 0%, ${tmpl.primary_color}00 100%)`
+                    }} />
+                    <div className="absolute bottom-0 left-0 right-0 h-1/3" style={{ background: tmpl.accent_color, opacity: 0.95 }} />
+                    <div className="absolute inset-0 flex flex-col items-center justify-center text-center p-3">
+                      <div className="w-5 h-px mb-2" style={{ backgroundColor: tmpl.primary_color }} />
+                      <div className="text-[8px] tracking-[0.15em] uppercase mb-1.5"
+                        style={{ color: `${tmpl.primary_color}88` }}>
+                        The Wedding of
+                      </div>
+                      <div className="text-sm font-serif leading-tight"
+                        style={{ color: tmpl.primary_color, fontFamily: tmpl.font_family }}>
+                        Bride & Groom
+                      </div>
+                      <div className="w-4 h-px my-1" style={{ backgroundColor: tmpl.primary_color, opacity: 0.3 }} />
+                      <div className="text-[7px] tracking-wider" style={{ color: `${tmpl.secondary_color}cc` }}>
+                        15 Maret 2027
+                      </div>
+                    </div>
+
+                    {isActive && (
+                      <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }}
+                        className="absolute top-2 right-2 bg-neutral-800 text-white text-[9px] px-2 py-0.5 flex items-center gap-1">
+                        <Check className="w-2.5 h-2.5" /> Aktif
+                      </motion.div>
+                    )}
+
+                    {/* Hover overlay */}
+                    <div className="absolute inset-0 bg-black/0 hover:bg-black/20 transition-colors flex items-center justify-center opacity-0 hover:opacity-100">
+                      <span className="bg-white text-neutral-700 text-[10px] tracking-wider uppercase px-4 py-2">
+                        Preview
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Info */}
+                  <div className="p-3">
+                    <h3 className="text-xs font-serif text-neutral-800 mb-0.5">{tmpl.name}</h3>
+                    <p className="text-[10px] text-neutral-400 line-clamp-1">{tmpl.description}</p>
+                    <div className="flex gap-1 mt-2">
+                      <div className="w-3.5 h-3.5 rounded-full border border-neutral-200" style={{ backgroundColor: tmpl.primary_color }} />
+                      <div className="w-3.5 h-3.5 rounded-full border border-neutral-200" style={{ backgroundColor: tmpl.secondary_color }} />
+                      <div className="w-3.5 h-3.5 rounded-full border border-neutral-200" style={{ backgroundColor: tmpl.accent_color }} />
+                    </div>
+                  </div>
+                </motion.div>
+              );
+            })}
+          </div>
+        )}
+
+        {/* Hint */}
+        {!loading && (
+          <div className="mt-8 text-center">
+            <p className="text-xs text-neutral-400">
+              💡 Klik template untuk <strong>preview undangan lengkap</strong>, lalu klik &quot;Pilih Template Ini&quot; untuk menerapkan
+            </p>
           </div>
         )}
       </main>
 
-      {/* Preview Modal */}
+      {/* Full Invite Preview Modal */}
       <AnimatePresence>
         {previewTemplate && (
-          <PreviewModal
+          <FullInvitePreview
             template={previewTemplate}
-            isSelected={currentTemplateId === previewTemplate.id}
             onClose={() => setPreviewTemplate(null)}
             onSelect={() => {
-              handleSelectTemplate(previewTemplate.id);
+              handleSelect(previewTemplate.id);
               setPreviewTemplate(null);
             }}
             saving={saving}
@@ -195,225 +488,5 @@ export default function TemplateGallery() {
         )}
       </AnimatePresence>
     </div>
-  );
-}
-
-/* ── Template Card ─────────────────────────────────────────────────────────── */
-
-function TemplateCard({
-  template,
-  index,
-  isSelected,
-  onSelect,
-  onPreview,
-  saving,
-}: {
-  template: Template;
-  index: number;
-  isSelected: boolean;
-  onSelect: () => void;
-  onPreview: () => void;
-  saving: boolean;
-}) {
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: index * 0.05 }}
-      className={`group relative bg-white border-2 transition-all cursor-pointer hover:shadow-lg ${
-        isSelected ? "border-neutral-800 shadow-lg" : "border-neutral-100 hover:border-neutral-300"
-      }`}
-    >
-      {/* Color Preview */}
-      <div className="relative h-48 overflow-hidden">
-        <div className="absolute inset-0" style={{ background: template.secondary_color }} />
-        <div
-          className="absolute inset-0"
-          style={{ background: `linear-gradient(180deg, ${template.primary_color}33 0%, ${template.primary_color}00 100%)` }}
-        />
-        <div className="absolute bottom-0 left-0 right-h-2/3" style={{ background: template.accent_color, opacity: 0.9 }} />
-        {/* Mini invitation preview */}
-        <div className="absolute inset-0 flex flex-col items-center justify-center text-center p-4">
-          <div className="w-8 h-px mb-3" style={{ backgroundColor: template.primary_color }} />
-          <div
-            className="text-[9px] tracking-[0.2em] uppercase mb-2"
-            style={{ color: `${template.primary_color}99` }}
-          >
-            The Wedding of
-          </div>
-          <div
-            className="text-base font-serif mb-1 leading-tight"
-            style={{ color: template.primary_color, fontFamily: template.font_family }}
-          >
-            Bride & Groom
-          </div>
-          <div className="w-6 h-px my-1.5" style={{ backgroundColor: template.primary_color, opacity: 0.3 }} />
-          <div className="text-[8px] tracking-wider" style={{ color: `${template.secondary_color}cc` }}>
-            15 Maret 2026
-          </div>
-        </div>
-
-        {/* Current badge */}
-        {isSelected && (
-          <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }}
-            className="absolute top-3 right-3 bg-neutral-800 text-white text-xs px-3 py-1 flex items-center gap-1">
-            <Check className="w-3 h-3" /> Aktif
-          </motion.div>
-        )}
-
-        {/* Premium badge */}
-        {template.is_premium ? (
-          <div className="absolute top-3 left-3 bg-amber-400 text-amber-900 text-xs px-2 py-1 flex items-center gap-1">
-            <Sparkles className="w-3 h-3" /> Premium
-          </div>
-        ) : null}
-
-        {/* Hover actions */}
-        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-colors flex items-center justify-center gap-3 opacity-0 group-hover:opacity-100">
-          <button
-            onClick={(e) => { e.stopPropagation(); onPreview(); }}
-            className="px-4 py-2 bg-white text-neutral-700 text-xs tracking-wider uppercase hover:bg-neutral-100 transition-colors flex items-center gap-2"
-          >
-            <Eye className="w-4 h-4" /> Preview
-          </button>
-        </div>
-      </div>
-
-      {/* Info */}
-      <div className="p-4">
-        <div className="flex items-center justify-between mb-1">
-          <h3 className="font-serif text-neutral-800">{template.name}</h3>
-          {isSelected ? (
-            <span className="text-xs text-neutral-400">Aktif</span>
-          ) : (
-            <button
-              onClick={(e) => { e.stopPropagation(); onSelect(); }}
-              disabled={saving}
-              className="px-3 py-1.5 text-xs tracking-wider uppercase bg-neutral-800 text-white hover:bg-neutral-700 disabled:opacity-50 transition-colors"
-            >
-              {saving ? <Loader2 className="w-3 h-3 animate-spin" /> : "Pilih"}
-            </button>
-          )}
-        </div>
-        <p className="text-xs text-neutral-400 line-clamp-2">{template.description}</p>
-        {/* Color swatches */}
-        <div className="flex gap-1.5 mt-3">
-          <div className="w-5 h-5 rounded-full border border-neutral-200" style={{ backgroundColor: template.primary_color }} title="Primary" />
-          <div className="w-5 h-5 rounded-full border border-neutral-200" style={{ backgroundColor: template.secondary_color }} title="Secondary" />
-          <div className="w-5 h-5 rounded-full border border-neutral-200" style={{ backgroundColor: template.accent_color }} title="Accent" />
-        </div>
-      </div>
-    </motion.div>
-  );
-}
-
-/* ── Preview Modal ─────────────────────────────────────────────────────────── */
-
-function PreviewModal({
-  template,
-  isSelected,
-  onClose,
-  onSelect,
-  saving,
-}: {
-  template: Template;
-  isSelected: boolean;
-  onClose: () => void;
-  onSelect: () => void;
-  saving: boolean;
-}) {
-  return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
-      onClick={onClose}
-    >
-      <motion.div
-        initial={{ scale: 0.9, opacity: 0 }}
-        animate={{ scale: 1, opacity: 1 }}
-        exit={{ scale: 0.9, opacity: 0 }}
-        className="bg-white w-full max-w-lg max-h-[90vh] overflow-y-auto shadow-2xl"
-        onClick={(e) => e.stopPropagation()}
-      >
-        {/* Preview area */}
-        <div
-          className="h-64 sm:h-80 relative flex flex-col items-center justify-center p-8"
-          style={{ background: `linear-gradient(135deg, ${template.accent_color} 0%, ${template.primary_color}22 100%)` }}
-        >
-          <div className="text-xs tracking-[0.3em] uppercase mb-3" style={{ color: template.secondary_color }}>
-            The Wedding of
-          </div>
-          <div
-            className="text-3xl sm:text-4xl font-serif mb-3 text-center"
-            style={{ color: template.primary_color, fontFamily: template.font_family }}
-          >
-            Bride & Groom
-          </div>
-          <div className="w-16 h-px mb-3" style={{ backgroundColor: template.primary_color }} />
-          <div className="text-xs tracking-wider uppercase opacity-60" style={{ color: template.secondary_color }}>
-            Sabtu, 15 Maret 2026
-          </div>
-          <div className="absolute bottom-8 text-xs tracking-wider opacity-40" style={{ color: template.secondary_color }}>
-            Jakarta, Indonesia
-          </div>
-        </div>
-
-        {/* Info */}
-        <div className="p-6">
-          <div className="flex items-center justify-between mb-2">
-            <h2 className="text-xl font-serif text-neutral-800">{template.name}</h2>
-            {template.is_premium ? (
-              <span className="text-xs bg-amber-100 text-amber-700 px-2 py-1 flex items-center gap-1">
-                <Sparkles className="w-3 h-3" /> Premium
-              </span>
-            ) : (
-              <span className="text-xs bg-green-100 text-green-700 px-2 py-1">Gratis</span>
-            )}
-          </div>
-          <p className="text-neutral-500 text-sm mb-4">{template.description}</p>
-
-          {/* Color palette */}
-          <div className="flex gap-3 mb-6">
-            <div className="text-center">
-              <div className="w-10 h-10 rounded border border-neutral-200 mb-1" style={{ backgroundColor: template.primary_color }} />
-              <span className="text-[10px] text-neutral-400">Primary</span>
-            </div>
-            <div className="text-center">
-              <div className="w-10 h-10 rounded border border-neutral-200 mb-1" style={{ backgroundColor: template.secondary_color }} />
-              <span className="text-[10px] text-neutral-400">Secondary</span>
-            </div>
-            <div className="text-center">
-              <div className="w-10 h-10 rounded border border-neutral-200 mb-1" style={{ backgroundColor: template.accent_color }} />
-              <span className="text-[10px] text-neutral-400">Accent</span>
-            </div>
-            <div className="text-center">
-              <div className="flex items-center justify-center w-10 h-10 rounded border border-neutral-200 mb-1 bg-white">
-                <span className="text-xs" style={{ fontFamily: template.font_family }}>Aa</span>
-              </div>
-              <span className="text-[10px] text-neutral-400">Font</span>
-            </div>
-          </div>
-
-          {/* Actions */}
-          <div className="flex gap-3">
-            <button onClick={onClose} className="flex-1 px-4 py-3 border border-neutral-200 text-neutral-600 text-sm tracking-wider hover:bg-neutral-50 transition-colors">
-              Tutup
-            </button>
-            {isSelected ? (
-              <div className="flex-1 px-4 py-3 bg-green-50 text-green-700 text-sm tracking-wider flex items-center justify-center gap-2">
-                <Check className="w-4 h-4" /> Template Aktif
-              </div>
-            ) : (
-              <button onClick={onSelect} disabled={saving}
-                className="flex-1 px-4 py-3 bg-neutral-800 text-white text-sm tracking-wider hover:bg-neutral-700 disabled:opacity-50 transition-colors">
-                {saving ? <Loader2 className="w-4 h-4 animate-spin mx-auto" /> : "Pilih Template"}
-              </button>
-            )}
-          </div>
-        </div>
-      </motion.div>
-    </motion.div>
   );
 }
