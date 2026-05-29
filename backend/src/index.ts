@@ -6,7 +6,7 @@ import dashboardRoutes from "./routes/dashboard";
 import guestRoutes from "./routes/guests";
 
 const app = express();
-const PORT = 4001;
+const PORT = Number(process.env.PORT) || 4001;
 
 // ─── Middleware ──────────────────────────────────────────────────────────────
 app.use(
