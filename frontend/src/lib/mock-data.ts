@@ -15,6 +15,14 @@ export interface Couple {
   quoteSource: string;
   heroImage: string;
   coupleImage: string;
+  bridePhoto: string;
+  groomPhoto: string;
+  gallery_1: string;
+  gallery_2: string;
+  gallery_3: string;
+  gallery_4: string;
+  gallery_5: string;
+  gallery_6: string;
 }
 
 export interface Guest {
@@ -44,6 +52,14 @@ export const mockCouple: Couple = {
   quoteSource: "QS. Ar-Rum: 21",
   heroImage: "https://images.unsplash.com/photo-1519741497674-611481863552?w=1920&q=80",
   coupleImage: "https://images.unsplash.com/photo-1606800052052-a08af7148866?w=800&q=80",
+  bridePhoto: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&q=80",
+  groomPhoto: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&q=80",
+  gallery_1: "https://images.unsplash.com/photo-1606800052052-a08af7148866?w=600&q=80",
+  gallery_2: "https://images.unsplash.com/photo-1583939003579-730e3918a45a?w=600&q=80",
+  gallery_3: "https://images.unsplash.com/photo-1522673607200-164d1b6ce486?w=600&q=80",
+  gallery_4: "https://images.unsplash.com/photo-1529636798458-92182e662485?w=600&q=80",
+  gallery_5: "https://images.unsplash.com/photo-1511285560929-80b456fea0bc?w=600&q=80",
+  gallery_6: "https://images.unsplash.com/photo-1465495976277-4387d4b0b4c6?w=600&q=80",
 };
 
 export const mockGuests: Guest[] = [

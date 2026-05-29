@@ -44,6 +44,7 @@ export default function InvitePage() {
       .then((data) => {
         if (data.bride_name) {
           setCouple({
+            ...mockCouple,
             brideName: data.bride_name || mockCouple.brideName,
             groomName: data.groom_name || mockCouple.groomName,
             date: data.wedding_date || mockCouple.date,
@@ -55,11 +56,16 @@ export default function InvitePage() {
             quoteSource: data.quote_source || mockCouple.quoteSource,
             brideParents: data.bride_parents || mockCouple.brideParents,
             groomParents: data.groom_parents || mockCouple.groomParents,
-            slug: mockCouple.slug,
-            gmapsUrl: mockCouple.gmapsUrl,
-            gmapsEmbed: mockCouple.gmapsEmbed,
             heroImage: data.hero_image || mockCouple.heroImage,
             coupleImage: data.photo_url || mockCouple.coupleImage,
+            bridePhoto: data.bride_photo || mockCouple.bridePhoto,
+            groomPhoto: data.groom_photo || mockCouple.groomPhoto,
+            gallery_1: data.gallery_1 || mockCouple.gallery_1,
+            gallery_2: data.gallery_2 || mockCouple.gallery_2,
+            gallery_3: data.gallery_3 || mockCouple.gallery_3,
+            gallery_4: data.gallery_4 || mockCouple.gallery_4,
+            gallery_5: data.gallery_5 || mockCouple.gallery_5,
+            gallery_6: data.gallery_6 || mockCouple.gallery_6,
           });
         }
       })
@@ -187,7 +193,7 @@ export default function InvitePage() {
           <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
             <div className="absolute inset-0">
               <img
-                src="https://images.unsplash.com/photo-1519741497674-611481863552?w=1920&q=80"
+                src={couple.heroImage}
                 alt="Wedding"
                 className="w-full h-full object-cover"
               />
@@ -295,7 +301,7 @@ export default function InvitePage() {
                 >
                   <div className="w-40 h-40 sm:w-48 sm:h-48 mx-auto mb-8 rounded-full overflow-hidden">
                     <img
-                      src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&q=80"
+                      src={couple.bridePhoto}
                       alt={couple.brideName}
                       className="w-full h-full object-cover"
                     />
@@ -322,7 +328,7 @@ export default function InvitePage() {
                 >
                   <div className="w-40 h-40 sm:w-48 sm:h-48 mx-auto mb-8 rounded-full overflow-hidden">
                     <img
-                      src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&q=80"
+                      src={couple.groomPhoto}
                       alt={couple.groomName}
                       className="w-full h-full object-cover"
                     />
@@ -489,14 +495,7 @@ export default function InvitePage() {
               </motion.div>
 
               <div className="grid grid-cols-2 md:grid-cols-3 gap-2 sm:gap-3">
-                {[
-                  "https://images.unsplash.com/photo-1606800052052-a08af7148866?w=600&q=80",
-                  "https://images.unsplash.com/photo-1583939003579-730e3918a45a?w=600&q=80",
-                  "https://images.unsplash.com/photo-1522673607200-164d1b6ce486?w=600&q=80",
-                  "https://images.unsplash.com/photo-1529636798458-92182e662485?w=600&q=80",
-                  "https://images.unsplash.com/photo-1511285560929-80b456fea0bc?w=600&q=80",
-                  "https://images.unsplash.com/photo-1465495976277-4387d4b0b4c6?w=600&q=80",
-                ].map((src, i) => (
+                {[couple.gallery_1, couple.gallery_2, couple.gallery_3, couple.gallery_4, couple.gallery_5, couple.gallery_6].filter(Boolean).map((src, i) => (
                   <motion.div
                     key={i}
                     initial={{ opacity: 0 }}

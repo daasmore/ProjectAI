@@ -19,7 +19,6 @@ interface ImageField {
 
 export default function ImageManager({ config, onSave, saving }: Props) {
   const [uploading, setUploading] = useState<string | null>(null);
-  const [useUrl, setUseUrl] = useState<Record<string, boolean>>({});
   const fileRefs = useRef<Record<string, HTMLInputElement | null>>({});
 
   const imageFields: ImageField[] = [
@@ -40,7 +39,20 @@ export default function ImageManager({ config, onSave, saving }: Props) {
     return initial;
   });
 
+  const [urlInputs, setUrlInputs] = useState<Record<string, string>>(() => {
+    const init: Record<string, string> = {};
+    imageFields.forEach((f) => { init[f.key] = ""; });
+    return init;
+  });
+
   const setUrl = (key: string, val: string) => setUrls((p) => ({ ...p, [key]: val }));
+
+  const handleUrlSubmit = (key: string) => {
+    const url = urlInputs[key]?.trim();
+    if (!url) return;
+    setUrl(key, url);
+    setUrlInputs((p) => ({ ...p, [key]: "" }));
+  };
 
   const handleFileUpload = async (key: string, file: File) => {
     setUploading(key);
@@ -48,14 +60,22 @@ export default function ImageManager({ config, onSave, saving }: Props) {
       const reader = new FileReader();
       reader.onload = async (e) => {
         const base64 = e.target?.result as string;
-        const res = await fetch("/api/v1/upload", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ base64, filename: file.name }),
-        });
-        if (res.ok) {
-          const data = await res.json();
-          setUrl(key, data.url);
+        try {
+          const res = await fetch("/api/v1/upload", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ base64, filename: file.name }),
+          });
+          if (res.ok) {
+            const data = await res.json();
+            setUrl(key, data.url);
+          } else {
+            // If upload fails, use a data URL fallback
+            setUrl(key, base64);
+          }
+        } catch {
+          // Network error fallback
+          setUrl(key, URL.createObjectURL(file));
         }
       };
       reader.readAsDataURL(file);
@@ -78,66 +98,20 @@ export default function ImageManager({ config, onSave, saving }: Props) {
         <Image className="w-4 h-4 text-neutral-400" />
         <h2 className="text-lg font-serif font-light text-neutral-800">Kelola Gambar</h2>
       </div>
-      <p className="text-neutral-400 text-sm mb-6">Upload foto atau masukkan URL gambar. Klik &quot;Simpan Semua&quot; setelah selesai.</p>
+      <p className="text-neutral-400 text-sm mb-6">Masukkan URL gambar atau upload file dari komputer.</p>
 
       <div className="space-y-4">
         {imageFields.map((field) => (
           <div key={field.key} className="border border-neutral-100 p-4">
-            <div className="flex items-center justify-between mb-3">
-              <label className="text-xs tracking-wider uppercase text-neutral-500">{field.label}</label>
-              <div className="flex gap-1">
-                <button
-                  onClick={() => setUseUrl((p) => ({ ...p, [field.key]: false }))}
-                  className={`px-2 py-1 text-[10px] tracking-wider uppercase border ${!useUrl[field.key] ? "bg-neutral-800 text-white border-neutral-800" : "border-neutral-200 text-neutral-400"}`}
-                >
-                  <Upload className="w-3 h-3 inline mr-1" />Upload
-                </button>
-                <button
-                  onClick={() => setUseUrl((p) => ({ ...p, [field.key]: true }))}
-                  className={`px-2 py-1 text-[10px] tracking-wider uppercase border ${useUrl[field.key] ? "bg-neutral-800 text-white border-neutral-800" : "border-neutral-200 text-neutral-400"}`}
-                >
-                  <Link className="w-3 h-3 inline mr-1" />URL
-                </button>
-              </div>
-            </div>
+            <label className="text-xs tracking-wider uppercase text-neutral-500 mb-2 block">{field.label}</label>
 
-            {useUrl[field.key] ? (
-              <input
-                value={urls[field.key] || ""}
-                onChange={(e) => setUrl(field.key, e.target.value)}
-                className="wedding-input text-sm"
-                placeholder={field.placeholder}
-              />
-            ) : (
-              <div className="flex items-center gap-3">
-                <input
-                  type="file"
-                  accept="image/*"
-                  ref={(el) => { fileRefs.current[field.key] = el; }}
-                  onChange={(e) => {
-                    const file = e.target.files?.[0];
-                    if (file) handleFileUpload(field.key, file);
-                  }}
-                  className="hidden"
-                />
-                <button
-                  onClick={() => fileRefs.current[field.key]?.click()}
-                  className="px-4 py-2.5 border border-neutral-200 text-xs tracking-wider uppercase text-neutral-500 hover:bg-neutral-50 transition-colors flex items-center gap-2"
-                >
-                  <Upload className="w-3.5 h-3.5" />
-                  Pilih File
-                </button>
-                {uploading === field.key && <Loader2 className="w-4 h-4 text-neutral-300 animate-spin" />}
-              </div>
-            )}
-
-            {/* Preview */}
-            {urls[field.key] && (
-              <div className="mt-3 relative">
+            {/* Current image preview */}
+            {urls[field.key] ? (
+              <div className="mb-3 relative">
                 <img
                   src={urls[field.key]}
                   alt={field.label}
-                  className="w-full h-32 object-cover border border-neutral-100"
+                  className="w-full h-28 object-cover border border-neutral-100"
                   onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
                 />
                 <button
@@ -147,7 +121,46 @@ export default function ImageManager({ config, onSave, saving }: Props) {
                   <X className="w-3.5 h-3.5" />
                 </button>
               </div>
-            )}
+            ) : null}
+
+            {/* URL input */}
+            <div className="flex gap-2 mb-2">
+              <input
+                value={urlInputs[field.key] || ""}
+                onChange={(e) => setUrlInputs((p) => ({ ...p, [field.key]: e.target.value }))}
+                onKeyDown={(e) => e.key === "Enter" && handleUrlSubmit(field.key)}
+                className="wedding-input text-sm flex-1"
+                placeholder={field.placeholder}
+              />
+              <button
+                onClick={() => handleUrlSubmit(field.key)}
+                className="px-3 py-2 border border-neutral-200 text-xs tracking-wider uppercase text-neutral-500 hover:bg-neutral-50 transition-colors flex items-center gap-1"
+              >
+                <Link className="w-3 h-3" /> Set
+              </button>
+            </div>
+
+            {/* File upload */}
+            <div className="flex items-center gap-2">
+              <input
+                type="file"
+                accept="image/*"
+                ref={(el) => { fileRefs.current[field.key] = el; }}
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  if (file) handleFileUpload(field.key, file);
+                }}
+                className="hidden"
+              />
+              <button
+                onClick={() => fileRefs.current[field.key]?.click()}
+                className="px-3 py-2 border border-neutral-200 text-xs tracking-wider uppercase text-neutral-500 hover:bg-neutral-50 transition-colors flex items-center gap-1.5"
+              >
+                <Upload className="w-3 h-3" />
+                Upload File
+              </button>
+              {uploading === field.key && <Loader2 className="w-4 h-4 text-neutral-300 animate-spin" />}
+            </div>
           </div>
         ))}
       </div>
