@@ -72,7 +72,7 @@ export default function TemplateGallery() {
     setSaved(false);
     setError("");
     try {
-      const res = await fetch(`/api/v1/templates/weddings/${weddingId}/template`, {
+      const res = await fetch(`/api/v1/templates/assign-template/${weddingId}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ template_id: templateId }),

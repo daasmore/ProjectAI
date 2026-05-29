@@ -44,8 +44,8 @@ router.get("/slug/:slug", (req: Request, res: Response) => {
   }
 });
 
-// PUT /api/v1/weddings/:id/template — set template for a wedding
-router.put("/weddings/:id/template", (req: Request, res: Response) => {
+// PUT /api/v1/templates/assign-template/:id — set template for a wedding
+router.put("/assign-template/:id", (req: Request, res: Response) => {
   try {
     const { id } = req.params;
     const { template_id } = req.body;

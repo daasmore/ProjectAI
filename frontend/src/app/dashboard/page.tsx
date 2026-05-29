@@ -14,6 +14,7 @@ interface Wedding {
   wedding_date: string;
   venue: string;
   template_id: string;
+  user_id: string;
   created_at: string;
 }
 
@@ -45,7 +46,17 @@ export default function DashboardPage() {
     try {
       const res = await fetch("/api/v1/weddings");
       const data = await res.json();
-      if (data.weddings) setWeddings(data.weddings);
+      if (data.weddings) {
+        // Filter by current user if user_id exists
+        const userData = localStorage.getItem("wedding_user");
+        if (userData) {
+          const u = JSON.parse(userData);
+          const filtered = data.weddings.filter((w: Wedding) => !w.user_id || w.user_id === u.id || w.user_id === "");
+          setWeddings(filtered.length > 0 ? filtered : data.weddings);
+        } else {
+          setWeddings(data.weddings);
+        }
+      }
     } catch { /* ignore */ }
     setLoading(false);
   };
@@ -61,6 +72,8 @@ export default function DashboardPage() {
     setCreating(true);
     const form = e.currentTarget;
     const formData = new FormData(form);
+    const userData = localStorage.getItem("wedding_user");
+    const userId = userData ? JSON.parse(userData).id : "";
 
     try {
       const res = await fetch("/api/v1/weddings", {
@@ -72,6 +85,7 @@ export default function DashboardPage() {
           wedding_date: formData.get("wedding_date"),
           venue: formData.get("venue"),
           slug: `${String(formData.get("groom_name")).toLowerCase().replace(/\s+/g, "-")}-${String(formData.get("bride_name")).toLowerCase().replace(/\s+/g, "-")}-${Date.now().toString(36)}`,
+          user_id: userId,
         }),
       });
       const data = await res.json();
