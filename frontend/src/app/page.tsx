@@ -10,176 +10,147 @@ import {
   BarChart3,
   Globe,
   Shield,
-  ChevronRight,
-  Stars,
+
+  ArrowRight,
 } from "lucide-react";
-import WeddingNavbar from "@/components/WeddingNavbar";
-import WeddingFooter from "@/components/WeddingFooter";
-import ScrollReveal from "@/components/ScrollReveal";
-import FloatingParticles from "@/components/FloatingParticles";
 
 export default function LandingPage() {
   const features = [
     {
-      icon: <Heart className="w-6 h-6" />,
+      icon: <Heart className="w-5 h-5" />,
       title: "Undangan Elegan",
-      desc: "Template cantik dengan animasi mewah yang memukau tamu undangan.",
+      desc: "Desain minimalist yang indah dan mudah dikustomisasi.",
     },
     {
-      icon: <MessageSquare className="w-6 h-6" />,
+      icon: <MessageSquare className="w-5 h-5" />,
       title: "RSVP Online",
-      desc: "Tamu bisa konfirmasi kehadiran langsung dari undangan digital.",
+      desc: "Tamu langsung konfirmasi kehadiran dari undangan digital.",
     },
     {
-      icon: <MapPin className="w-6 h-6" />,
+      icon: <MapPin className="w-5 h-5" />,
       title: "Peta Interaktif",
-      desc: "Google Maps embed untuk memudahkan tamu menemukan lokasi acara.",
+      desc: "Google Maps untuk memudahkan tamu menemukan lokasi.",
     },
     {
-      icon: <Globe className="w-6 h-6" />,
+      icon: <Globe className="w-5 h-5" />,
       title: "WhatsApp Blast",
-      desc: "Kirim undangan ke ratusan nomor sekaligus via WhatsApp.",
+      desc: "Kirim undangan ke ratusan nomor via WhatsApp.",
     },
     {
-      icon: <BarChart3 className="w-6 h-6" />,
+      icon: <BarChart3 className="w-5 h-5" />,
       title: "Dashboard Tamu",
-      desc: "Kelola & pantau daftar tamu, statistik RSVP, dan export data.",
+      desc: "Kelola & pantau daftar tamu, statistik RSVP, export data.",
     },
     {
-      icon: <Shield className="w-6 h-6" />,
+      icon: <Shield className="w-5 h-5" />,
       title: "Anti-Spam",
-      desc: "Rate limiting & queue system agar tidak terblokir WhatsApp.",
+      desc: "Rate limiting & queue system agar tidak terblokir WA.",
     },
   ];
 
   const steps = [
-    {
-      num: "01",
-      title: "Isi Data Mempelai",
-      desc: "Masukkan nama, tanggal, lokasi, dan foto mempelai.",
-    },
-    {
-      num: "02",
-      title: "Kustomisasi Undangan",
-      desc: "Pilih tema, warna, dan musik yang sesuai dengan selera Anda.",
-    },
-    {
-      num: "03",
-      title: "Bagikan Undangan",
-      desc: "Kirim via WhatsApp blast atau share link undangan ke tamu.",
-    },
-    {
-      num: "04",
-      title: "Pantau RSVP",
-      desc: "Kelola kehadiran tamu melalui dashboard yang informatif.",
-    },
-  ];
-
-  const testimonials = [
-    {
-      name: "Rina & Fajar",
-      text: "Undangan digitalnya sangat cantik! Tamu-tamu pada kagum dan semua RSVP bisa terpantau dengan mudah.",
-      date: "April 2026",
-    },
-    {
-      name: "Dita & Rama",
-      text: "Fitur WhatsApp blast-nya sangat membantu. 200+ undangan terkirim dalam hitungan menit!",
-      date: "Mei 2026",
-    },
-    {
-      name: "Lestari & Budi",
-      text: "Animasinya mewah seperti undangan beneran. Mempelai jadi lebih berkesan di mata tamu.",
-      date: "Juni 2026",
-    },
+    { num: "01", title: "Isi Data Mempelai", desc: "Nama, tanggal, lokasi, dan foto mempelai." },
+    { num: "02", title: "Kustomisasi Tema", desc: "Pilih tema, warna, dan musik sesuai selera." },
+    { num: "03", title: "Bagikan Undangan", desc: "Kirim via WhatsApp blast atau share link." },
+    { num: "04", title: "Pantau RSVP", desc: "Kelola kehadiran tamu melalui dashboard." },
   ];
 
   return (
-    <div className="min-h-screen">
-      <WeddingNavbar />
+    <div className="min-h-screen bg-white">
+      {/* Navbar */}
+      <nav className="fixed top-0 left-0 right-0 z-50 bg-white/90 backdrop-blur-md border-b border-neutral-100">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6">
+          <div className="flex items-center justify-between h-14">
+            <Link href="/" className="flex items-center gap-2">
+              <Heart className="w-4 h-4 text-neutral-400" />
+              <span className="text-sm font-medium text-neutral-800 tracking-wider uppercase">Wedding<span className="text-neutral-400">Invite</span></span>
+            </Link>
+            <div className="hidden md:flex items-center gap-8">
+              <Link href="/" className="text-neutral-500 hover:text-neutral-800 transition-colors text-xs tracking-wider uppercase">Beranda</Link>
+              <Link href="/invite/sarah-ahmad" className="text-neutral-500 hover:text-neutral-800 transition-colors text-xs tracking-wider uppercase">Undangan</Link>
+              <Link href="/dashboard" className="text-neutral-500 hover:text-neutral-800 transition-colors text-xs tracking-wider uppercase">Dashboard</Link>
+            </div>
+            <Link href="/invite/sarah-ahmad" className="text-xs tracking-wider uppercase text-neutral-500 hover:text-neutral-800 transition-colors border-b border-neutral-200 hover:border-neutral-400 pb-0.5">
+              Lihat Demo
+            </Link>
+          </div>
+        </div>
+      </nav>
 
-      {/* Hero Section */}
-      <section className="relative min-h-screen flex items-center justify-center overflow-hidden pt-16">
-        <FloatingParticles count={25} />
-
-        {/* Background gradient overlay */}
-        <div className="absolute inset-0 bg-gradient-to-b from-champagne-100/50 via-cream-50 to-cream-50 pointer-events-none" />
-
-        <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 text-center">
+      {/* Hero */}
+      <section className="relative min-h-screen flex items-center justify-center pt-14">
+        <div className="max-w-3xl mx-auto px-4 sm:px-6 text-center">
           <motion.div
-            initial={{ opacity: 0, y: -30 }}
+            initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, ease: "easeOut" }}
+            transition={{ duration: 0.6 }}
           >
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-champagne-100/80 border border-champagne-200 mb-8">
-              <Sparkles className="w-4 h-4 text-champagne-500" />
-              <span className="text-sm text-sage-600 font-medium">
-                Undangan Pernikahan Digital Premium
-              </span>
+            <div className="flex items-center justify-center gap-2 mb-8">
+              <div className="w-8 h-px bg-neutral-200" />
+              <Sparkles className="w-3.5 h-3.5 text-neutral-300" />
+              <div className="w-8 h-px bg-neutral-200" />
             </div>
           </motion.div>
 
           <motion.h1
-            initial={{ opacity: 0, y: 30 }}
+            initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.2 }}
-            className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-serif font-bold text-sage-800 leading-tight mb-6"
+            transition={{ duration: 0.6, delay: 0.1 }}
+            className="text-4xl sm:text-5xl md:text-6xl font-serif font-light text-neutral-800 leading-tight mb-6"
           >
-            Undangan yang{" "}
-            <span className="text-gradient-gold">Berkesan</span>
+            Undangan Digital
             <br />
-            untuk Hari yang{" "}
-            <span className="text-gradient-gold">Spesial</span>
+            yang <span className="italic">Berkesan</span>
           </motion.h1>
 
           <motion.p
-            initial={{ opacity: 0, y: 30 }}
+            initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.4 }}
-            className="text-lg sm:text-xl text-sage-500 max-w-2xl mx-auto mb-10 leading-relaxed"
+            transition={{ duration: 0.6, delay: 0.2 }}
+            className="text-neutral-500 text-base sm:text-lg max-w-lg mx-auto mb-10 leading-relaxed"
           >
-            Buat undangan pernikahan digital dengan animasi elegan,
-            RSVP online, dan integrasi WhatsApp. Gratis untuk memulai!
+            Desain minimalist, RSVP online, dan integrasi WhatsApp.
+            Gratis untuk memulai.
           </motion.p>
 
           <motion.div
-            initial={{ opacity: 0, y: 30 }}
+            initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.6 }}
-            className="flex flex-col sm:flex-row items-center justify-center gap-4"
+            transition={{ duration: 0.6, delay: 0.3 }}
+            className="flex flex-col sm:flex-row items-center justify-center gap-3"
           >
             <Link
               href="/invite/sarah-ahmad"
-              className="wedding-btn-primary text-base px-10 py-4 group"
+              className="wedding-btn-primary text-xs"
             >
               Lihat Demo Undangan
-              <ChevronRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
             </Link>
             <Link
               href="/dashboard"
-              className="wedding-btn-secondary text-base px-10 py-4"
+              className="wedding-btn-secondary text-xs"
             >
               Dashboard
             </Link>
           </motion.div>
 
-          {/* Wedding image preview */}
+          {/* Preview Image */}
           <motion.div
-            initial={{ opacity: 0, y: 50 }}
+            initial={{ opacity: 0, y: 40 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 1, delay: 0.8 }}
-            className="mt-16"
+            transition={{ duration: 0.8, delay: 0.5 }}
+            className="mt-20"
           >
-            <div className="relative rounded-2xl overflow-hidden shadow-2xl shadow-champagne-300/30 border border-champagne-200/60">
-              <div className="aspect-[16/9] bg-gradient-to-br from-champagne-100 to-champagne-200 relative">
+            <div className="relative overflow-hidden border border-neutral-100">
+              <div className="aspect-[16/9] bg-neutral-100 relative">
                 <img
                   src="https://images.unsplash.com/photo-1519741497674-611481863552?w=1200&q=80"
                   alt="Wedding Preview"
                   className="w-full h-full object-cover"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-sage-900/40 to-transparent" />
-                <div className="absolute bottom-6 left-6 right-6 text-white text-left">
-                  <p className="text-2xl font-serif font-semibold">Sarah & Ahmad</p>
-                  <p className="text-sm opacity-80">15 Juli 2026</p>
+                <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent" />
+                <div className="absolute bottom-6 left-6 text-white text-left">
+                  <p className="text-xl font-serif font-light">Sarah & Ahmad</p>
+                  <p className="text-xs opacity-70 mt-1">15 Juli 2026</p>
                 </div>
               </div>
             </div>
@@ -187,130 +158,110 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Features Section */}
-      <section className="py-24 relative">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6">
-          <ScrollReveal>
-            <div className="text-center mb-16">
-              <h2 className="text-3xl sm:text-4xl font-serif font-bold text-sage-800 mb-4">
-                Fitur Lengkap untuk Pernikahan Sempurna
-              </h2>
-              <p className="text-sage-500 max-w-2xl mx-auto">
-                Semua yang Anda butuhkan untuk membuat undangan pernikahan digital yang mengesankan.
-              </p>
-            </div>
-          </ScrollReveal>
+      {/* Features */}
+      <section className="py-24 sm:py-32 px-4 sm:px-6 bg-neutral-50">
+        <div className="max-w-5xl mx-auto">
+          <motion.div
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true }}
+            className="text-center mb-16"
+          >
+            <p className="text-[10px] tracking-[0.3em] uppercase text-neutral-400 mb-3">Fitur</p>
+            <h2 className="text-2xl sm:text-3xl font-serif font-light text-neutral-800">
+              Semua yang Anda Butuhkan
+            </h2>
+          </motion.div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {features.map((feature, index) => (
-              <ScrollReveal key={feature.title} delay={index * 0.1}>
-                <div className="wedding-card h-full hover:shadow-xl hover:shadow-champagne-200/40 transition-shadow duration-300 group">
-                  <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-champagne-200 to-champagne-300 flex items-center justify-center text-sage-700 mb-4 group-hover:scale-110 transition-transform duration-300">
-                    {feature.icon}
-                  </div>
-                  <h3 className="font-serif text-lg font-semibold text-sage-800 mb-2">
-                    {feature.title}
-                  </h3>
-                  <p className="text-sage-500 text-sm leading-relaxed">
-                    {feature.desc}
-                  </p>
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {features.map((f, i) => (
+              <motion.div
+                key={f.title}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.4, delay: i * 0.05 }}
+                className="bg-white p-6 border border-neutral-100 hover:border-neutral-200 transition-colors"
+              >
+                <div className="w-8 h-8 flex items-center justify-center text-neutral-400 mb-4">
+                  {f.icon}
                 </div>
-              </ScrollReveal>
+                <h3 className="text-sm font-medium text-neutral-800 mb-1.5">{f.title}</h3>
+                <p className="text-neutral-400 text-sm leading-relaxed">{f.desc}</p>
+              </motion.div>
             ))}
           </div>
         </div>
       </section>
 
       {/* How It Works */}
-      <section className="py-24 bg-gradient-to-b from-champagne-50/50 to-cream-50">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6">
-          <ScrollReveal>
-            <div className="text-center mb-16">
-              <h2 className="text-3xl sm:text-4xl font-serif font-bold text-sage-800 mb-4">
-                Cara Kerjanya
-              </h2>
-              <p className="text-sage-500 max-w-2xl mx-auto">
-                Hanya dalam 4 langkah, undangan pernikapan digital Anda siap dibagikan.
-              </p>
-            </div>
-          </ScrollReveal>
+      <section className="py-24 sm:py-32 px-4 sm:px-6">
+        <div className="max-w-5xl mx-auto">
+          <motion.div
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true }}
+            className="text-center mb-16"
+          >
+            <p className="text-[10px] tracking-[0.3em] uppercase text-neutral-400 mb-3">Cara Kerja</p>
+            <h2 className="text-2xl sm:text-3xl font-serif font-light text-neutral-800">
+              Hanya 4 Langkah
+            </h2>
+          </motion.div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {steps.map((step, index) => (
-              <ScrollReveal key={step.num} delay={index * 0.15}>
-                <div className="text-center relative">
-                  <div className="text-5xl font-serif font-bold text-champagne-200 mb-2">
-                    {step.num}
-                  </div>
-                  <h3 className="font-serif text-lg font-semibold text-sage-800 mb-2">
-                    {step.title}
-                  </h3>
-                  <p className="text-sage-500 text-sm">{step.desc}</p>
-                  {index < steps.length - 1 && (
-                    <div className="hidden lg:block absolute top-8 -right-4 text-champagne-300">
-                      <ChevronRight className="w-8 h-8" />
-                    </div>
-                  )}
-                </div>
-              </ScrollReveal>
+          <div className="grid md:grid-cols-4 gap-8">
+            {steps.map((s, i) => (
+              <motion.div
+                key={s.num}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.4, delay: i * 0.1 }}
+                className="text-center"
+              >
+                <div className="text-3xl font-serif font-light text-neutral-200 mb-3">{s.num}</div>
+                <h3 className="text-sm font-medium text-neutral-800 mb-1.5">{s.title}</h3>
+                <p className="text-neutral-400 text-sm">{s.desc}</p>
+              </motion.div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Testimonials */}
-      <section className="py-24">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6">
-          <ScrollReveal>
-            <div className="text-center mb-16">
-              <h2 className="text-3xl sm:text-4xl font-serif font-bold text-sage-800 mb-4">
-                Apa Kata Mereka?
-              </h2>
-            </div>
-          </ScrollReveal>
-
-          <div className="grid md:grid-cols-3 gap-6">
-            {testimonials.map((t, index) => (
-              <ScrollReveal key={t.name} delay={index * 0.15}>
-                <div className="wedding-card h-full">
-                  <Stars className="w-5 h-5 text-champagne-400 mb-3" />
-                  <p className="text-sage-600 text-sm leading-relaxed mb-4 italic">
-                    &ldquo;{t.text}&rdquo;
-                  </p>
-                  <div className="mt-auto pt-4 border-t border-champagne-100">
-                    <p className="font-serif font-semibold text-sage-800 text-sm">{t.name}</p>
-                    <p className="text-xs text-sage-400">{t.date}</p>
-                  </div>
-                </div>
-              </ScrollReveal>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* CTA Section */}
-      <section className="py-24 bg-gradient-to-br from-sage-700 to-sage-800 relative overflow-hidden">
-        <FloatingParticles count={10} />
-        <div className="max-w-3xl mx-auto px-4 sm:px-6 text-center relative z-10">
-          <ScrollReveal>
-            <Heart className="w-10 h-10 text-champagne-400 fill-champagne-400 mx-auto mb-6 animate-float" />
-            <h2 className="text-3xl sm:text-4xl font-serif font-bold text-white mb-4">
+      {/* CTA */}
+      <section className="py-24 sm:py-32 px-4 sm:px-6 bg-neutral-800">
+        <div className="max-w-2xl mx-auto text-center">
+          <motion.div
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true }}
+          >
+            <Heart className="w-5 h-5 text-neutral-600 mx-auto mb-6" />
+            <h2 className="text-2xl sm:text-3xl font-serif font-light text-white mb-4">
               Siap Membuat Undangan Anda?
             </h2>
-            <p className="text-sage-300 mb-8">
-              Mulai buat undangan pernikahan digital yang elegan dan berkesan hari ini.
+            <p className="text-neutral-400 mb-8 text-sm">
+              Mulai buat undangan pernikahan digital yang elegan hari ini.
             </p>
             <Link
               href="/invite/sarah-ahmad"
-              className="wedding-btn-primary text-base px-10 py-4"
+              className="inline-flex items-center gap-2 px-8 py-3 bg-white text-neutral-800 text-xs tracking-wider uppercase hover:bg-neutral-100 transition-colors"
             >
               Lihat Demo Sekarang
+              <ArrowRight className="w-3.5 h-3.5" />
             </Link>
-          </ScrollReveal>
+          </motion.div>
         </div>
       </section>
 
-      <WeddingFooter />
+      {/* Footer */}
+      <footer className="py-8 px-4 border-t border-neutral-100">
+        <div className="max-w-5xl mx-auto text-center">
+          <p className="text-neutral-400 text-[10px] tracking-[0.15em] uppercase">
+            © {new Date().getFullYear()} WeddingInvite — Undangan Pernikahan Digital
+          </p>
+        </div>
+      </footer>
     </div>
   );
 }

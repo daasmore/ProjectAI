@@ -4,6 +4,8 @@ import weddingRoutes from "./routes/weddings";
 import rsvpRoutes from "./routes/rsvp";
 import dashboardRoutes from "./routes/dashboard";
 import guestRoutes from "./routes/guests";
+import configRoutes from "./routes/config";
+import uploadRoutes from "./routes/upload";
 
 const app = express();
 const PORT = Number(process.env.PORT) || 4001;
@@ -34,6 +36,8 @@ app.use("/api/v1/weddings", weddingRoutes);
 app.use("/api/v1/rsvp", rsvpRoutes);
 app.use("/api/v1/dashboard", dashboardRoutes);
 app.use("/api/v1/guests", guestRoutes);
+app.use("/api/v1/weddings", configRoutes);
+app.use("/api/v1", uploadRoutes);
 
 // ─── 404 ─────────────────────────────────────────────────────────────────────
 app.use((_req, res) => {

@@ -13,13 +13,10 @@ import {
   Download,
   Trash2,
   User,
-  Phone,
-  MessageSquare,
   X,
 } from "lucide-react";
 import { mockGuests, type Guest } from "@/lib/mock-data";
 import WeddingNavbar from "@/components/WeddingNavbar";
-import ScrollReveal from "@/components/ScrollReveal";
 
 type FilterStatus = "all" | "confirmed" | "declined" | "pending";
 
@@ -41,305 +38,137 @@ export default function DashboardPage() {
     confirmed: guests.filter((g) => g.status === "confirmed").length,
     declined: guests.filter((g) => g.status === "declined").length,
     pending: guests.filter((g) => g.status === "pending").length,
-    totalAttending: guests
-      .filter((g) => g.status === "confirmed")
-      .reduce((sum, g) => sum + g.guestCount, 0),
+    totalAttending: guests.filter((g) => g.status === "confirmed").reduce((s, g) => s + g.guestCount, 0),
   };
 
-  const handleDelete = (id: string) => {
-    setGuests(guests.filter((g) => g.id !== id));
-  };
+  const handleDelete = (id: string) => setGuests(guests.filter((g) => g.id !== id));
 
   const handleAddGuest = () => {
     if (!newGuest.name.trim()) return;
-    const guest: Guest = {
-      id: String(Date.now()),
-      name: newGuest.name,
-      phone: newGuest.phone,
-      guestCount: newGuest.guestCount,
-      status: "pending",
-    };
-    setGuests([guest, ...guests]);
+    setGuests([{ id: String(Date.now()), name: newGuest.name, phone: newGuest.phone, guestCount: newGuest.guestCount, status: "pending" }, ...guests]);
     setNewGuest({ name: "", phone: "", guestCount: 1 });
     setShowAddForm(false);
   };
 
   const handleExportCSV = () => {
     const header = "Nama,Telepon,Status,Jumlah Tamu,Pesan,Tanggal Respon\n";
-    const rows = guests
-      .map(
-        (g) =>
-          `"${g.name}","${g.phone || ""}","${g.status}",${g.guestCount},"${g.message || ""}","${g.respondedAt || ""}"`
-      )
-      .join("\n");
-    const csv = header + rows;
-    const blob = new Blob([csv], { type: "text/csv" });
+    const rows = guests.map((g) => `"${g.name}","${g.phone || ""}","${g.status}",${g.guestCount},"${g.message || ""}","${g.respondedAt || ""}"`).join("\n");
+    const blob = new Blob([header + rows], { type: "text/csv" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
-    a.href = url;
-    a.download = "daftar-tamu-rsvp.csv";
-    a.click();
+    a.href = url; a.download = "daftar-tamu-rsvp.csv"; a.click();
     URL.revokeObjectURL(url);
   };
 
-  const statusConfig = {
-    confirmed: {
-      label: "Hadir",
-      icon: <CheckCircle className="w-4 h-4" />,
-      bg: "bg-green-100 text-green-700 border-green-200",
-      dot: "bg-green-500",
-    },
-    declined: {
-      label: "Tidak Hadir",
-      icon: <XCircle className="w-4 h-4" />,
-      bg: "bg-red-100 text-red-700 border-red-200",
-      dot: "bg-red-500",
-    },
-    pending: {
-      label: "Menunggu",
-      icon: <Clock className="w-4 h-4" />,
-      bg: "bg-amber-100 text-amber-700 border-amber-200",
-      dot: "bg-amber-500",
-    },
+  const statusConfig: Record<string, { label: string; bg: string }> = {
+    confirmed: { label: "Hadir", bg: "bg-neutral-800 text-white" },
+    declined: { label: "Tidak Hadir", bg: "bg-neutral-200 text-neutral-600" },
+    pending: { label: "Menunggu", bg: "bg-neutral-100 text-neutral-500" },
   };
 
-  const statCards = [
-    {
-      label: "Total Tamu",
-      value: stats.total,
-      icon: <Users className="w-5 h-5" />,
-      color: "from-sage-500 to-sage-600",
-    },
-    {
-      label: "Konfirmasi Hadir",
-      value: stats.confirmed,
-      icon: <CheckCircle className="w-5 h-5" />,
-      color: "from-green-500 to-green-600",
-    },
-    {
-      label: "Tidak Hadir",
-      value: stats.declined,
-      icon: <XCircle className="w-5 h-5" />,
-      color: "from-red-500 to-red-600",
-    },
-    {
-      label: "Menunggu",
-      value: stats.pending,
-      icon: <Clock className="w-5 h-5" />,
-      color: "from-amber-500 to-amber-600",
-    },
-  ];
-
   return (
-    <div className="min-h-screen bg-cream-50 bg-wedding-pattern">
+    <div className="min-h-screen bg-white">
       <WeddingNavbar />
-
       <div className="pt-24 pb-16">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6">
           {/* Header */}
-          <ScrollReveal>
-            <div className="text-center mb-10">
-              <h1 className="text-3xl sm:text-4xl font-serif font-bold text-sage-800 mb-2">
-                Dashboard Tamu
-              </h1>
-              <p className="text-sage-500">
-                Kelola daftar tamu dan pantau RSVP pernikahan Anda
-              </p>
-            </div>
-          </ScrollReveal>
+          <div className="mb-10">
+            <h1 className="text-2xl sm:text-3xl font-serif font-light text-neutral-800 mb-1">Dashboard Tamu</h1>
+            <p className="text-neutral-400 text-sm">Kelola daftar tamu dan pantau RSVP pernikahan Anda</p>
+          </div>
 
-          {/* Stats Cards */}
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-            {statCards.map((stat, index) => (
-              <ScrollReveal key={stat.label} delay={index * 0.1}>
-                <div className="wedding-card">
-                  <div className="flex items-center justify-between mb-3">
-                    <div
-                      className={`w-10 h-10 rounded-xl bg-gradient-to-br ${stat.color} flex items-center justify-center text-white`}
-                    >
-                      {stat.icon}
-                    </div>
-                    <span className="text-2xl font-bold text-sage-800">{stat.value}</span>
-                  </div>
-                  <p className="text-sm text-sage-500">{stat.label}</p>
+          {/* Stats */}
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-8">
+            {[
+              { label: "Total Tamu", value: stats.total, icon: <Users className="w-4 h-4" /> },
+              { label: "Konfirmasi Hadir", value: stats.confirmed, icon: <CheckCircle className="w-4 h-4" /> },
+              { label: "Tidak Hadir", value: stats.declined, icon: <XCircle className="w-4 h-4" /> },
+              { label: "Menunggu", value: stats.pending, icon: <Clock className="w-4 h-4" /> },
+            ].map((s, i) => (
+              <motion.div key={s.label} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }} className="bg-neutral-50 p-4 border border-neutral-100">
+                <div className="flex items-center justify-between mb-2">
+                  <div className="text-neutral-400">{s.icon}</div>
+                  <span className="text-2xl font-serif font-light text-neutral-800">{s.value}</span>
                 </div>
-              </ScrollReveal>
+                <p className="text-xs text-neutral-400 tracking-wider uppercase">{s.label}</p>
+              </motion.div>
             ))}
           </div>
 
-          {/* Chart Bar */}
-          <ScrollReveal>
-            <div className="wedding-card mb-8">
-              <div className="flex items-center gap-2 mb-4">
-                <BarChart3 className="w-5 h-5 text-champagne-500" />
-                <h3 className="font-semibold text-sage-800">Statistik Kehadiran</h3>
-              </div>
-              <div className="space-y-3">
-                {[
-                  { label: "Hadir", count: stats.confirmed, total: stats.total, color: "bg-green-500" },
-                  { label: "Tidak Hadir", count: stats.declined, total: stats.total, color: "bg-red-500" },
-                  { label: "Menunggu", count: stats.pending, total: stats.total, color: "bg-amber-500" },
-                ].map((bar) => (
-                  <div key={bar.label} className="flex items-center gap-4">
-                    <span className="text-sm text-sage-600 w-24 shrink-0">{bar.label}</span>
-                    <div className="flex-1 h-6 bg-sage-100 rounded-full overflow-hidden">
-                      <motion.div
-                        initial={{ width: 0 }}
-                        animate={{
-                          width: `${bar.total > 0 ? (bar.count / bar.total) * 100 : 0}%`,
-                        }}
-                        transition={{ duration: 0.8, delay: 0.3 }}
-                        className={`h-full ${bar.color} rounded-full`}
-                      />
-                    </div>
-                    <span className="text-sm font-semibold text-sage-700 w-10 text-right">
-                      {bar.count}
-                    </span>
-                  </div>
-                ))}
-              </div>
-              <div className="mt-4 pt-4 border-t border-champagne-100 flex items-center gap-6 text-sm">
-                <div className="flex items-center gap-2">
-                  <Users className="w-4 h-4 text-sage-500" />
-                  <span className="text-sage-600">
-                    Total yang akan hadir:{" "}
-                    <strong className="text-sage-800">{stats.totalAttending} orang</strong>
-                  </span>
-                </div>
-              </div>
+          {/* Chart */}
+          <div className="bg-neutral-50 border border-neutral-100 p-5 mb-8">
+            <div className="flex items-center gap-2 mb-4">
+              <BarChart3 className="w-4 h-4 text-neutral-400" />
+              <h3 className="text-xs tracking-wider uppercase text-neutral-400">Statistik Kehadiran</h3>
             </div>
-          </ScrollReveal>
+            <div className="space-y-2">
+              {[
+                { label: "Hadir", count: stats.confirmed, total: stats.total, color: "bg-neutral-800" },
+                { label: "Tidak Hadir", count: stats.declined, total: stats.total, color: "bg-neutral-300" },
+                { label: "Menunggu", count: stats.pending, total: stats.total, color: "bg-neutral-200" },
+              ].map((bar) => (
+                <div key={bar.label} className="flex items-center gap-3">
+                  <span className="text-xs text-neutral-500 w-20">{bar.label}</span>
+                  <div className="flex-1 h-5 bg-neutral-100 overflow-hidden">
+                    <motion.div initial={{ width: 0 }} animate={{ width: `${bar.total > 0 ? (bar.count / bar.total) * 100 : 0}%` }} transition={{ duration: 0.6, delay: 0.2 }} className={`h-full ${bar.color}`} />
+                  </div>
+                  <span className="text-xs font-medium text-neutral-600 w-6 text-right">{bar.count}</span>
+                </div>
+              ))}
+            </div>
+            <div className="mt-3 pt-3 border-t border-neutral-200 text-xs text-neutral-400">
+              Total yang akan hadir: <strong className="text-neutral-700">{stats.totalAttending} orang</strong>
+            </div>
+          </div>
 
           {/* Guest List */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.3 }}
-            className="wedding-card"
-          >
+          <div className="bg-neutral-50 border border-neutral-100">
             {/* Toolbar */}
-            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
-              <h3 className="font-semibold text-sage-800 flex items-center gap-2">
-                <Users className="w-5 h-5 text-champagne-500" />
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 p-4 border-b border-neutral-100">
+              <h3 className="text-xs tracking-wider uppercase text-neutral-400 flex items-center gap-2">
+                <Users className="w-3.5 h-3.5" />
                 Daftar Tamu ({filteredGuests.length})
               </h3>
-
-              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full sm:w-auto">
-                {/* Search */}
+              <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
                 <div className="relative">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-sage-400" />
-                  <input
-                    type="text"
-                    value={search}
-                    onChange={(e) => setSearch(e.target.value)}
-                    placeholder="Cari tamu..."
-                    className="pl-9 pr-4 py-2 text-sm border border-champagne-200 rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-champagne-400 w-full sm:w-56"
-                  />
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-neutral-300" />
+                  <input type="text" value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Cari tamu..." className="pl-8 pr-3 py-2 text-xs border border-neutral-200 bg-white focus:outline-none focus:border-neutral-400 w-full sm:w-48" />
                 </div>
-
                 <div className="flex gap-2">
-                  <button
-                    onClick={() => setShowAddForm(true)}
-                    className="inline-flex items-center gap-1.5 px-4 py-2 bg-champagne-500 text-white text-sm rounded-xl hover:bg-champagne-600 transition-colors"
-                  >
-                    <Plus className="w-4 h-4" />
-                    Tambah
+                  <button onClick={() => setShowAddForm(true)} className="inline-flex items-center gap-1 px-3 py-2 bg-neutral-800 text-white text-xs tracking-wider uppercase hover:bg-neutral-900 transition-colors">
+                    <Plus className="w-3 h-3" /> Tambah
                   </button>
-                  <button
-                    onClick={handleExportCSV}
-                    className="inline-flex items-center gap-1.5 px-4 py-2 bg-white border border-champagne-200 text-sage-600 text-sm rounded-xl hover:bg-champagne-50 transition-colors"
-                  >
-                    <Download className="w-4 h-4" />
-                    Export
+                  <button onClick={handleExportCSV} className="inline-flex items-center gap-1 px-3 py-2 bg-white border border-neutral-200 text-neutral-500 text-xs tracking-wider uppercase hover:bg-neutral-50 transition-colors">
+                    <Download className="w-3 h-3" /> Export
                   </button>
                 </div>
               </div>
             </div>
 
-            {/* Filter Tabs */}
-            <div className="flex gap-2 mb-6 overflow-x-auto scrollbar-hide pb-1">
-              {(
-                [
-                  { key: "all", label: "Semua" },
-                  { key: "confirmed", label: "Hadir" },
-                  { key: "declined", label: "Tidak Hadir" },
-                  { key: "pending", label: "Menunggu" },
-                ] as const
-              ).map(({ key, label }) => (
-                <button
-                  key={key}
-                  onClick={() => setFilter(key)}
-                  className={`px-4 py-2 text-sm rounded-full whitespace-nowrap transition-all duration-200 ${
-                    filter === key
-                      ? "bg-champagne-500 text-white shadow-md"
-                      : "bg-white border border-champagne-200 text-sage-500 hover:bg-champagne-50"
-                  }`}
-                >
-                  {label}
-                  {key !== "all" && (
-                    <span className="ml-1.5 text-xs opacity-70">
-                      ({guests.filter((g) => g.status === key).length})
-                    </span>
-                  )}
+            {/* Filter */}
+            <div className="flex gap-1 p-4 border-b border-neutral-100">
+              {(["all", "confirmed", "declined", "pending"] as const).map((key) => (
+                <button key={key} onClick={() => setFilter(key)} className={`px-3 py-1.5 text-[10px] tracking-wider uppercase transition-all duration-200 ${filter === key ? "bg-neutral-800 text-white" : "bg-white border border-neutral-200 text-neutral-400 hover:border-neutral-300"}`}>
+                  {key === "all" ? "Semua" : key === "confirmed" ? "Hadir" : key === "declined" ? "Tidak Hadir" : "Menunggu"}
                 </button>
               ))}
             </div>
 
-            {/* Add Guest Form */}
+            {/* Add Form */}
             <AnimatePresence>
               {showAddForm && (
-                <motion.div
-                  initial={{ opacity: 0, height: 0 }}
-                  animate={{ opacity: 1, height: "auto" }}
-                  exit={{ opacity: 0, height: 0 }}
-                  className="mb-6 overflow-hidden"
-                >
-                  <div className="bg-champagne-50/50 rounded-xl p-4 border border-champagne-200">
-                    <div className="flex items-center justify-between mb-4">
-                      <h4 className="font-medium text-sage-800 text-sm">Tambah Tamu Manual</h4>
-                      <button
-                        onClick={() => setShowAddForm(false)}
-                        className="p-1 hover:bg-champagne-100 rounded-lg transition-colors"
-                      >
-                        <X className="w-4 h-4 text-sage-500" />
-                      </button>
+                <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="overflow-hidden border-b border-neutral-100">
+                  <div className="p-4 bg-white">
+                    <div className="flex items-center justify-between mb-3">
+                      <h4 className="text-xs tracking-wider uppercase text-neutral-500">Tambah Tamu Manual</h4>
+                      <button onClick={() => setShowAddForm(false)} className="p-1 hover:bg-neutral-100"><X className="w-3.5 h-3.5 text-neutral-400" /></button>
                     </div>
-                    <div className="grid sm:grid-cols-3 gap-3">
-                      <input
-                        type="text"
-                        value={newGuest.name}
-                        onChange={(e) => setNewGuest({ ...newGuest, name: e.target.value })}
-                        placeholder="Nama tamu"
-                        className="wedding-input text-sm py-2.5"
-                      />
-                      <input
-                        type="text"
-                        value={newGuest.phone}
-                        onChange={(e) => setNewGuest({ ...newGuest, phone: e.target.value })}
-                        placeholder="No. telepon (opsional)"
-                        className="wedding-input text-sm py-2.5"
-                      />
+                    <div className="grid sm:grid-cols-3 gap-2">
+                      <input type="text" value={newGuest.name} onChange={(e) => setNewGuest({ ...newGuest, name: e.target.value })} placeholder="Nama" className="px-3 py-2 text-xs border border-neutral-200 focus:outline-none focus:border-neutral-400" />
+                      <input type="text" value={newGuest.phone} onChange={(e) => setNewGuest({ ...newGuest, phone: e.target.value })} placeholder="Telepon (opsional)" className="px-3 py-2 text-xs border border-neutral-200 focus:outline-none focus:border-neutral-400" />
                       <div className="flex gap-2">
-                        <select
-                          value={newGuest.guestCount}
-                          onChange={(e) =>
-                            setNewGuest({ ...newGuest, guestCount: Number(e.target.value) })
-                          }
-                          className="wedding-input text-sm py-2.5 flex-1"
-                        >
-                          {[1, 2, 3, 4, 5].map((n) => (
-                            <option key={n} value={n}>
-                              {n} orang
-                            </option>
-                          ))}
-                        </select>
-                        <button
-                          onClick={handleAddGuest}
-                          disabled={!newGuest.name.trim()}
-                          className="wedding-btn-primary text-sm py-2.5 px-4 disabled:opacity-40"
-                        >
-                          Simpan
-                        </button>
+                        <input type="number" min={1} max={10} value={newGuest.guestCount} onChange={(e) => setNewGuest({ ...newGuest, guestCount: Number(e.target.value) })} className="w-20 px-3 py-2 text-xs border border-neutral-200 focus:outline-none focus:border-neutral-400" />
+                        <button onClick={handleAddGuest} className="px-4 py-2 bg-neutral-800 text-white text-xs tracking-wider uppercase hover:bg-neutral-900 transition-colors">Tambah</button>
                       </div>
                     </div>
                   </div>
@@ -347,114 +176,52 @@ export default function DashboardPage() {
               )}
             </AnimatePresence>
 
-            {/* Guest Table */}
+            {/* Table */}
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead>
-                  <tr className="border-b border-champagne-200">
-                    <th className="text-left py-3 px-4 text-xs font-semibold text-sage-500 uppercase tracking-wider">
-                      Tamu
-                    </th>
-                    <th className="text-left py-3 px-4 text-xs font-semibold text-sage-500 uppercase tracking-wider hidden sm:table-cell">
-                      Telepon
-                    </th>
-                    <th className="text-left py-3 px-4 text-xs font-semibold text-sage-500 uppercase tracking-wider">
-                      Status
-                    </th>
-                    <th className="text-center py-3 px-4 text-xs font-semibold text-sage-500 uppercase tracking-wider hidden sm:table-cell">
-                      Jumlah
-                    </th>
-                    <th className="text-left py-3 px-4 text-xs font-semibold text-sage-500 uppercase tracking-wider hidden md:table-cell">
-                      Pesan
-                    </th>
-                    <th className="text-right py-3 px-4 text-xs font-semibold text-sage-500 uppercase tracking-wider">
-                      Aksi
-                    </th>
+                  <tr className="border-b border-neutral-100">
+                    <th className="text-left py-3 px-4 text-[10px] tracking-wider uppercase text-neutral-400">Nama</th>
+                    <th className="text-left py-3 px-4 text-[10px] tracking-wider uppercase text-neutral-400 hidden sm:table-cell">Telepon</th>
+                    <th className="text-left py-3 px-4 text-[10px] tracking-wider uppercase text-neutral-400">Status</th>
+                    <th className="text-center py-3 px-4 text-[10px] tracking-wider uppercase text-neutral-400 hidden sm:table-cell">Jumlah</th>
+                    <th className="text-left py-3 px-4 text-[10px] tracking-wider uppercase text-neutral-400 text-right">Aksi</th>
                   </tr>
                 </thead>
                 <tbody>
-                  <AnimatePresence>
-                    {filteredGuests.length === 0 ? (
-                      <tr>
-                        <td colSpan={6} className="text-center py-12 text-sage-400">
-                          <Users className="w-10 h-10 mx-auto mb-2 opacity-40" />
-                          <p className="text-sm">Tidak ada tamu ditemukan</p>
+                  {filteredGuests.map((guest, i) => {
+                    const config = statusConfig[guest.status];
+                    return (
+                      <motion.tr key={guest.id} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: i * 0.02 }} className="border-b border-neutral-100 hover:bg-neutral-50/50 transition-colors">
+                        <td className="py-3 px-4">
+                          <div className="flex items-center gap-2.5">
+                            <div className="w-7 h-7 rounded-full bg-neutral-100 flex items-center justify-center shrink-0">
+                              <User className="w-3 h-3 text-neutral-400" />
+                            </div>
+                            <div>
+                              <p className="text-sm text-neutral-700">{guest.name}</p>
+                              {guest.respondedAt && <p className="text-[10px] text-neutral-300">{new Date(guest.respondedAt).toLocaleDateString("id-ID", { day: "numeric", month: "short" })}</p>}
+                            </div>
+                          </div>
                         </td>
-                      </tr>
-                    ) : (
-                      filteredGuests.map((guest, index) => {
-                        const config = statusConfig[guest.status];
-                        return (
-                          <motion.tr
-                            key={guest.id}
-                            initial={{ opacity: 0, x: -10 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            exit={{ opacity: 0, x: 10 }}
-                            transition={{ duration: 0.2, delay: index * 0.03 }}
-                            className="border-b border-champagne-100 hover:bg-champagne-50/30 transition-colors"
-                          >
-                            <td className="py-3 px-4">
-                              <div className="flex items-center gap-3">
-                                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-champagne-200 to-champagne-300 flex items-center justify-center shrink-0">
-                                  <User className="w-4 h-4 text-sage-600" />
-                                </div>
-                                <div>
-                                  <p className="text-sm font-medium text-sage-800">{guest.name}</p>
-                                  {guest.respondedAt && (
-                                    <p className="text-xs text-sage-400">
-                                      {new Date(guest.respondedAt).toLocaleDateString("id-ID", {
-                                        day: "numeric",
-                                        month: "short",
-                                        year: "numeric",
-                                      })}
-                                    </p>
-                                  )}
-                                </div>
-                              </div>
-                            </td>
-                            <td className="py-3 px-4 hidden sm:table-cell">
-                              <div className="flex items-center gap-1.5 text-sm text-sage-500">
-                                <Phone className="w-3.5 h-3.5 text-sage-400" />
-                                {guest.phone || "-"}
-                              </div>
-                            </td>
-                            <td className="py-3 px-4">
-                              <span
-                                className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium border ${config.bg}`}
-                              >
-                                {config.icon}
-                                <span className="hidden sm:inline">{config.label}</span>
-                              </span>
-                            </td>
-                            <td className="py-3 px-4 text-center hidden sm:table-cell">
-                              <span className="text-sm text-sage-600 font-medium">
-                                {guest.guestCount > 0 ? guest.guestCount : "-"}
-                              </span>
-                            </td>
-                            <td className="py-3 px-4 hidden md:table-cell">
-                              <div className="flex items-center gap-1.5 text-sm text-sage-500 max-w-xs truncate">
-                                <MessageSquare className="w-3.5 h-3.5 text-sage-400 shrink-0" />
-                                <span className="truncate">{guest.message || "-"}</span>
-                              </div>
-                            </td>
-                            <td className="py-3 px-4 text-right">
-                              <button
-                                onClick={() => handleDelete(guest.id)}
-                                className="p-2 hover:bg-red-50 rounded-lg transition-colors group"
-                                title="Hapus tamu"
-                              >
-                                <Trash2 className="w-4 h-4 text-sage-400 group-hover:text-red-500" />
-                              </button>
-                            </td>
-                          </motion.tr>
-                        );
-                      })
-                    )}
-                  </AnimatePresence>
+                        <td className="py-3 px-4 text-xs text-neutral-400 hidden sm:table-cell">{guest.phone || "-"}</td>
+                        <td className="py-3 px-4">
+                          <span className={`inline-block px-2.5 py-1 text-[10px] tracking-wider uppercase ${config.bg}`}>{config.label}</span>
+                        </td>
+                        <td className="py-3 px-4 text-center text-xs text-neutral-500 hidden sm:table-cell">{guest.guestCount > 0 ? guest.guestCount : "-"}</td>
+                        <td className="py-3 px-4 text-right">
+                          <button onClick={() => handleDelete(guest.id)} className="p-1.5 hover:bg-neutral-100 transition-colors"><Trash2 className="w-3.5 h-3.5 text-neutral-300 hover:text-red-400" /></button>
+                        </td>
+                      </motion.tr>
+                    );
+                  })}
                 </tbody>
               </table>
+              {filteredGuests.length === 0 && (
+                <div className="text-center py-12 text-neutral-300 text-sm">Tidak ada tamu ditemukan</div>
+              )}
             </div>
-          </motion.div>
+          </div>
         </div>
       </div>
     </div>

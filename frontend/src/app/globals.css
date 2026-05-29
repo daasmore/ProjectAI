@@ -3,12 +3,8 @@
 @tailwind utilities;
 
 :root {
-  --background: #fefdfb;
-  --foreground: #3e4635;
-  --gold: #d4a95a;
-  --champagne: #faf0d8;
-  --cream: #fffdf7;
-  --sage: #7a8866;
+  --background: #ffffff;
+  --foreground: #1a1a1a;
 }
 
 @layer base {
@@ -17,74 +13,57 @@
   }
 
   body {
-    @apply bg-cream-50 text-sage-800 antialiased;
-    font-family: Georgia, 'Times New Roman', Times, serif;
+    @apply bg-white text-neutral-800 antialiased;
+    font-family: 'Helvetica Neue', Arial, sans-serif;
   }
 
   ::selection {
-    @apply bg-champagne-300 text-sage-900;
+    @apply bg-neutral-200 text-neutral-900;
   }
 }
 
 @layer components {
   .wedding-card {
-    @apply bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg shadow-champagne-200/50 border border-champagne-200/60 p-6 md:p-8;
+    @apply bg-white border border-neutral-100;
   }
 
   .wedding-btn-primary {
-    @apply inline-flex items-center justify-center px-8 py-3 bg-gradient-to-r from-champagne-500 to-gold-500 text-white font-medium rounded-full shadow-md hover:shadow-lg hover:from-champagne-600 hover:to-gold-600 transition-all duration-300 transform hover:scale-105 active:scale-95;
+    @apply inline-flex items-center justify-center px-8 py-3 bg-neutral-800 text-white text-sm tracking-wider uppercase hover:bg-neutral-900 transition-all duration-300 border border-neutral-800 hover:border-neutral-900;
   }
 
   .wedding-btn-secondary {
-    @apply inline-flex items-center justify-center px-8 py-3 bg-white border-2 border-champagne-400 text-sage-700 font-medium rounded-full hover:bg-champagne-50 hover:border-champagne-500 transition-all duration-300 transform hover:scale-105 active:scale-95;
+    @apply inline-flex items-center justify-center px-8 py-3 bg-white border border-neutral-200 text-neutral-600 text-sm tracking-wider uppercase hover:bg-neutral-50 hover:border-neutral-300 transition-all duration-300;
   }
 
   .wedding-input {
-    @apply w-full px-4 py-3 bg-white border border-champagne-200 rounded-xl text-sage-800 placeholder:text-sage-400 focus:outline-none focus:ring-2 focus:ring-champagne-400 focus:border-transparent transition-all duration-200;
+    @apply w-full px-4 py-3 bg-white border border-neutral-200 text-neutral-800 placeholder:text-neutral-400 focus:outline-none focus:border-neutral-400 transition-colors duration-200;
   }
 
-  .section-divider {
-    @apply w-24 h-0.5 bg-gradient-to-r from-transparent via-champagne-400 to-transparent mx-auto my-8;
+  .text-gradient-gold {
+    @apply text-neutral-800;
   }
 }
 
 @layer utilities {
-  .text-gradient-gold {
-    @apply bg-gradient-to-r from-champagne-500 via-gold-500 to-champagne-600 bg-clip-text text-transparent;
+  .animate-float {
+    animation: float 3s ease-in-out infinite;
   }
 
-  .bg-wedding-pattern {
-    background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23d4a95a' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
-  }
-
-  .scrollbar-hide {
-    -ms-overflow-style: none;
-    scrollbar-width: none;
-  }
-  .scrollbar-hide::-webkit-scrollbar {
-    display: none;
+  .animate-pulse-soft {
+    animation: pulse-soft 2s ease-in-out infinite;
   }
 }
 
-/* Confetti particle styles */
-.confetti-piece {
-  position: fixed;
-  width: 10px;
-  height: 10px;
-  top: -10px;
-  z-index: 9999;
-  pointer-events: none;
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
 }
 
-/* Smooth page transitions {
-  .page-transition-enter {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  .page-transition-enter-active {
-    opacity: 1;
-    transform: translateY(0);
-    transition: all 0.5s ease-out;
-  }
+@keyframes pulse-soft {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
 }
- */
+
+/* Scrollbar */
+.scrollbar-hide::-webkit-scrollbar { display: none; }
+.scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
