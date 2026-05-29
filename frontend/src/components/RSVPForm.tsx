@@ -47,12 +47,19 @@ export default function RSVPForm({ onSubmit }: RSVPFormProps) {
   const handleFormSubmit = async (data: RSVPFormData) => {
     setIsSubmitting(true);
     try {
-      if (onSubmit) {
-        await onSubmit(data);
-      } else {
-        // Mock submission
-        await new Promise((resolve) => setTimeout(resolve, 1500));
-      }
+      const res = await fetch("/api/v1/rsvp", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          wedding_id: "d840cc08-20ed-4014-b676-c2b3aae9c76a",
+          guest_name: data.name,
+          guest_count: data.guestCount,
+          status: data.status === "confirmed" ? "confirmed" : "declined",
+          message: data.message || "",
+        }),
+      });
+      if (!res.ok) throw new Error("Gagal mengirim RSVP");
+      if (onSubmit) await onSubmit(data);
       setSubmittedData(data);
       setIsSubmitted(true);
       if (data.status === "confirmed") {
