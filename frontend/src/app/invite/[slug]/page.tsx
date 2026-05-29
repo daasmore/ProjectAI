@@ -17,6 +17,7 @@ import {
 import { mockCouple } from "@/lib/mock-data";
 import RSVPForm from "@/components/RSVPForm";
 import FloatingParticles from "@/components/FloatingParticles";
+import EthnicOrnament, { EthnicDivider } from "@/components/ethnic/Ornaments";
 
 function formatDate(dateStr: string): string {
   const date = new Date(dateStr);
@@ -37,6 +38,7 @@ export default function InvitePage() {
   const [loading, setLoading] = useState(true);
   const [isOpened, setIsOpened] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
+  const [activeTemplateId, setActiveTemplateId] = useState("");
   const [tplColors, setTplColors] = useState<{primary: string; secondary: string; accent: string; font: string} | null>(null);
 
   useEffect(() => {
@@ -75,6 +77,7 @@ export default function InvitePage() {
         }
 
         if (data.template_id) {
+          setActiveTemplateId(data.template_id);
           try {
             const tRes = await fetch(`/api/v1/templates/${data.template_id}`);
             const tData = await tRes.json();
@@ -118,7 +121,7 @@ export default function InvitePage() {
             transition={{ duration: 0.6 }}
             className="fixed inset-0 z-50 flex items-center justify-center bg-white"
           >
-            <FloatingParticles count={15} />
+            <EthnicOrnament templateId={activeTemplateId} />
             <div className="text-center px-8 max-w-md mx-auto">
               {/* Small decorative line */}
               <motion.div
@@ -222,7 +225,7 @@ export default function InvitePage() {
             </div>
 
             <div className="relative z-10 text-center text-white px-8 max-w-2xl mx-auto">
-              <FloatingParticles count={20} />
+              
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}

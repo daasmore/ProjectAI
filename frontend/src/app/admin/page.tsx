@@ -154,7 +154,7 @@ export default function AdminPage() {
                 </p>
               </div>
               <Link
-                href={`/templates?wedding_id=04bf40ea-153f-4378-a896-8889f56f9dce`}
+                href="/templates"
                 className="inline-flex items-center gap-2 px-6 py-3 bg-neutral-800 text-white text-xs tracking-wider uppercase hover:bg-neutral-700 transition-colors"
               >
                 <Palette className="w-4 h-4" />

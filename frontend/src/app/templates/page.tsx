@@ -93,6 +93,7 @@ export default function TemplateGallery() {
       if (data.success) {
         setCurrentTemplateId(templateId);
         setSaved(true);
+        localStorage.setItem("wedding_id", weddingId);
         setTimeout(() => setSaved(false), 2000);
       } else {
         setError(data.error || "Gagal menyimpan template");

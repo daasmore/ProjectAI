@@ -90,6 +90,7 @@ export default function DashboardPage() {
       });
       const data = await res.json();
       if (data.success && data.wedding) {
+        localStorage.setItem("wedding_id", data.wedding.id);
         router.push(`/admin/${data.wedding.id}`);
       }
     } catch { /* ignore */ }
@@ -224,13 +225,15 @@ export default function DashboardPage() {
                 </p>
 
                 <div className="flex gap-2">
-                  <Link
-                  href={`/admin/${w.id}`}
-                  onClick={() => localStorage.setItem("wedding_id", w.id)}
+                  <button
+                  onClick={() => {
+                    localStorage.setItem("wedding_id", w.id);
+                    window.location.href = `/admin/${w.id}`;
+                  }}
                   className="flex-1 px-3 py-2 bg-neutral-800 text-white text-xs text-center tracking-wider hover:bg-neutral-700 transition-colors flex items-center justify-center gap-1"
                 >
                   <Settings className="w-3 h-3" /> Edit
-                </Link>
+                </button>
                   <Link
                     href={`/invite/${w.slug}`}
                     className="flex-1 px-3 py-2 border border-neutral-200 text-neutral-600 text-xs text-center tracking-wider hover:bg-neutral-50 transition-colors flex items-center justify-center gap-1"
