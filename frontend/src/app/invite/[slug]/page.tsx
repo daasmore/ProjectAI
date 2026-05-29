@@ -17,6 +17,41 @@ import {
 import { mockCouple } from "@/lib/mock-data";
 import RSVPForm from "@/components/RSVPForm";
 
+/* ✦ Glitter / Sparkle ✦ */
+function Sparkle({ delay = 0, x = "50%", y = "50%", size = 6, tone = "white" }: { delay?: number; x?: string; y?: string; size?: number; tone?: string }) {
+  const colorClass = tone === "gold" ? "text-amber-300" : "text-white/60";
+  return (
+    <motion.div
+      initial={{ opacity: 0, scale: 0 }}
+      animate={{ opacity: [0, 1, 0], scale: [0, 1, 0], rotate: [0, 180, 360] }}
+      transition={{ duration: 2, delay, repeat: Infinity, repeatDelay: 3 + Math.random() * 4 }}
+      className={`absolute pointer-events-none ${colorClass}`}
+      style={{ left: x, top: y }}
+    >
+      <svg width={size} height={size} viewBox="0 0 24 24" fill="none">
+        <path d="M12 0L14 10L24 12L14 14L12 24L10 14L0 12L10 10L12 0Z" fill="currentColor" />
+      </svg>
+    </motion.div>
+  );
+}
+
+function SparkleField({ count = 25, tone = "white" }: { count?: number; tone?: string }) {
+  const sparkles = Array.from({ length: count }, (_, i) => ({
+    id: i,
+    x: `${Math.random() * 100}%`,
+    y: `${Math.random() * 100}%`,
+    size: 4 + Math.random() * 10,
+    delay: Math.random() * 4,
+  }));
+  return (
+    <div className="absolute inset-0 overflow-hidden pointer-events-none z-20">
+      {sparkles.map((s) => (
+        <Sparkle key={s.id} delay={s.delay} x={s.x} y={s.y} size={s.size} tone={tone} />
+      ))}
+    </div>
+  );
+}
+
 function formatDate(dateStr: string): string {
   const date = new Date(dateStr);
   const days = ["Minggu", "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu"];
@@ -90,6 +125,7 @@ export default function InvitePage() {
             transition={{ duration: 0.6 }}
             className="fixed inset-0 z-50 flex items-center justify-center bg-white"
           >
+            <SparkleField count={15} tone="gold" />
             <div className="text-center px-8 max-w-md mx-auto">
               {/* Small decorative line */}
               <motion.div
@@ -193,6 +229,7 @@ export default function InvitePage() {
             </div>
 
             <div className="relative z-10 text-center text-white px-8 max-w-2xl mx-auto">
+              <SparkleField count={20} tone="white" />
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -547,7 +584,8 @@ export default function InvitePage() {
           </section>
 
           {/* ===== FOOTER ===== */}
-          <footer className="py-16 px-6 bg-neutral-800 text-center">
+          <footer className="py-16 px-6 bg-neutral-800 text-center relative overflow-hidden">
+            <SparkleField count={10} tone="white" />
             <motion.div
               initial={{ opacity: 0 }}
               whileInView={{ opacity: 1 }}
