@@ -37,11 +37,16 @@ export default function InvitePage() {
   const [loading, setLoading] = useState(true);
   const [isOpened, setIsOpened] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
+  const [tplColors, setTplColors] = useState<{primary: string; secondary: string; accent: string; font: string} | null>(null);
 
   useEffect(() => {
-    fetch("/api/v1/weddings/04bf40ea-153f-4378-a896-8889f56f9dce/config")
-      .then((r) => r.json())
-      .then((data) => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const res = await fetch("/api/v1/weddings/04bf40ea-153f-4378-a896-8889f56f9dce/config");
+        const data = await res.json();
+        if (cancelled) return;
+
         if (data.bride_name) {
           setCouple({
             ...mockCouple,
@@ -68,9 +73,25 @@ export default function InvitePage() {
             gallery_6: data.gallery_6 || mockCouple.gallery_6,
           });
         }
-      })
-      .catch(() => null)
-      .finally(() => setLoading(false));
+
+        if (data.template_id) {
+          try {
+            const tRes = await fetch(`/api/v1/templates/${data.template_id}`);
+            const tData = await tRes.json();
+            if (!cancelled && tData.template) {
+              setTplColors({
+                primary: tData.template.primary_color,
+                secondary: tData.template.secondary_color,
+                accent: tData.template.accent_color,
+                font: tData.template.font_family,
+              });
+            }
+          } catch { /* ignore */ }
+        }
+      } catch { /* ignore */ }
+      if (!cancelled) setLoading(false);
+    })();
+    return () => { cancelled = true; };
   }, []);
 
   if (loading) {
@@ -121,15 +142,15 @@ export default function InvitePage() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.8, delay: 0.6 }}
               >
-                <h1 className="text-4xl sm:text-5xl font-serif font-light text-neutral-800 leading-tight">
+                <h1 className="text-4xl sm:text-5xl font-serif font-light leading-tight" style={{ color: tplColors?.secondary || "#262626" }}>
                   {couple.brideName}
                 </h1>
                 <div className="flex items-center justify-center gap-4 my-4">
-                  <div className="h-px w-8 bg-neutral-200" />
-                  <span className="text-neutral-400 font-serif text-lg italic">&</span>
-                  <div className="h-px w-8 bg-neutral-200" />
+                  <div className="h-px w-8" style={{ backgroundColor: tplColors?.primary || "#e5e5e5" }} />
+                  <span className="font-serif text-lg italic" style={{ color: tplColors?.primary || "#a3a3a3" }}>&</span>
+                  <div className="h-px w-8" style={{ backgroundColor: tplColors?.primary || "#e5e5e5" }} />
                 </div>
-                <h1 className="text-4xl sm:text-5xl font-serif font-light text-neutral-800 leading-tight">
+                <h1 className="text-4xl sm:text-5xl font-serif font-light leading-tight" style={{ color: tplColors?.secondary || "#262626" }}>
                   {couple.groomName}
                 </h1>
               </motion.div>
@@ -549,7 +570,7 @@ export default function InvitePage() {
           </section>
 
           {/* ===== FOOTER ===== */}
-          <footer className="py-16 px-6 bg-neutral-800 text-center relative overflow-hidden">
+          <footer className="py-16 px-6 text-center relative overflow-hidden" style={{ backgroundColor: tplColors?.secondary || "#262626" }}>
             <FloatingParticles count={10} />
             <motion.div
               initial={{ opacity: 0 }}

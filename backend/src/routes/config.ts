@@ -13,6 +13,7 @@ const ALLOWED_COLUMNS = [
   "gallery_1", "gallery_2", "gallery_3", "gallery_4", "gallery_5", "gallery_6",
   "music_url", "font_family", "primary_color", "secondary_color", "accent_color",
   "gmaps_url", "gmaps_embed",
+  "template_id",
 ];
 
 // PUT /api/v1/weddings/:id/config — Save wedding config

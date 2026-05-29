@@ -2,20 +2,21 @@
 
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Save, Users, Calendar, Clock, MapPin, Loader2, CheckCircle, Upload } from "lucide-react";
+import { Save, Users, Calendar, Clock, MapPin, Loader2, CheckCircle, Upload, Sparkles, Palette } from "lucide-react";
 import MempelaiForm from "@/components/admin/MempelaiForm";
 import ThemeEditor from "@/components/admin/ThemeEditor";
 import ImageManager from "@/components/admin/ImageManager";
 import QuoteEditor from "@/components/admin/QuoteEditor";
 import LivePreview from "@/components/admin/LivePreview";
 
-type Tab = "mempelai" | "tema" | "gambar" | "quote";
+type Tab = "mempelai" | "tema" | "gambar" | "quote" | "template";
 
 const tabs: { key: Tab; label: string; icon: React.ReactNode }[] = [
   { key: "mempelai", label: "Data Mempelai", icon: <Users className="w-4 h-4" /> },
   { key: "tema", label: "Tema & Layout", icon: <Calendar className="w-4 h-4" /> },
   { key: "gambar", label: "Gambar", icon: <Upload className="w-4 h-4" /> },
   { key: "quote", label: "Quote", icon: <Clock className="w-4 h-4" /> },
+  { key: "template", label: "Template", icon: <Sparkles className="w-4 h-4" /> },
 ];
 
 export default function AdminPage() {
@@ -135,12 +136,37 @@ export default function AdminPage() {
               updateConfig={updateConfig}
             />
           )}
+          {activeTab === "template" && (
+            <div className="p-6 sm:p-8">
+              <div className="flex items-center gap-2 mb-2">
+                <Sparkles className="w-4 h-4 text-neutral-400" />
+                <h2 className="text-lg font-serif font-light text-neutral-800">Pilih Template</h2>
+              </div>
+              <p className="text-neutral-400 text-sm mb-6">
+                Pilih desain undangan yang sesuai dengan tema pernikahan Anda.
+                Setiap template memiliki warna, font, dan gaya yang berbeda.
+              </p>
+              <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 mb-6">
+                <p className="text-sm text-amber-700">
+                  💡 Klik tombol di bawah untuk membuka gallery template.
+                  Preview template akan ditampilkan sebelum Anda memilih.
+                </p>
+              </div>
+              <a
+                href="/templates"
+                className="inline-flex items-center gap-2 px-6 py-3 bg-neutral-800 text-white text-xs tracking-wider uppercase hover:bg-neutral-700 transition-colors"
+              >
+                <Palette className="w-4 h-4" />
+                Buka Gallery Template Lengkap
+              </a>
+            </div>
+          )}
         </div>
       </div>
 
       {/* Right: Live Preview (desktop only) */}
       <div className="hidden lg:block w-80 shrink-0">
-        <LivePreview slug="sarah-ahmad" config={config} refreshKey={previewKey} />
+        <LivePreview slug="bagus-pertiwi-2026" config={config} refreshKey={previewKey} />
       </div>
     </div>
   );
