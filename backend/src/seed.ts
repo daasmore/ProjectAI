@@ -18,55 +18,25 @@ db.prepare(
 ).run(
   weddingId,
   weddingSlug,
-  "Pertiwi Sari",         // bride_name
-  "Bagus Pratama",         // groom_name
-  "2026-08-15",            // wedding_date (masa depan)
-  "Gedung Serba Guna Melati", // venue
-  "Jl. Mawar No. 45, Bandung, Jawa Barat", // venue_address
-  "elegant-gold",           // theme
-  "https://images.unsplash.com/photo-1519741497674-611481863552?w=800", // photo_url
-  "Dengan penuh sukacita, kami mengundang Bapak/Ibu/Sahabat untuk menghadiri pernikahan kami." // description
+  "Sarah Putri",
+  "Ahmad Rizky",
+  "2026-08-15",
+  "Gedung Serbaguna Melati Ballroom",
+  "Jl. Bougenville No. 12, Kebayoran Baru, Jakarta Selatan",
+  "minimalist",
+  "https://images.unsplash.com/photo-1519741497674-611481863552?w=800",
+  "Dengan penuh sukacita, kami mengundang Bapak/Ibu/Sahabat untuk menghadiri pernikahan kami."
 );
 
 console.log(`✅ Wedding created: ${weddingSlug} (id: ${weddingId})`);
 
 // ─── RSVP Dummy Data ─────────────────────────────────────────────────────────
 const dummyRsvps = [
-  {
-    guest_name: "Ahmad Fauzi",
-    email: "ahmad@example.com",
-    guest_count: 2,
-    status: "confirmed",
-    message: "Selamat ya! Insyaa Allah hadir.",
-  },
-  {
-    guest_name: "Siti Nurhaliza",
-    email: "siti@example.com",
-    guest_count: 1,
-    status: "confirmed",
-    message: "Alhamdulillah, sangat Bahagia untuk kalian berdua!",
-  },
-  {
-    guest_name: "Budi Santoso",
-    email: "budi@example.com",
-    guest_count: 3,
-    status: "pending",
-    message: "Insyaa Allah datang, akan konfirmasi lagi.",
-  },
-  {
-    guest_name: "Dewi Lestari",
-    email: "dewi@example.com",
-    guest_count: 1,
-    status: "declined",
-    message: "Maaf, tidak bisa hadir karena ada acara keluarga.",
-  },
-  {
-    guest_name: "Rizky Hidayat",
-    email: "rizky@example.com",
-    guest_count: 2,
-    status: "confirmed",
-    message: "Selamat menempuh hidup baru!",
-  },
+  { guest_name: "Ahmad Fauzi", email: "ahmad@example.com", guest_count: 2, status: "confirmed", message: "Selamat ya! Insyaa Allah hadir." },
+  { guest_name: "Siti Nurhaliza", email: "siti@example.com", guest_count: 1, status: "confirmed", message: "Alhamdulillah!" },
+  { guest_name: "Budi Santoso", email: "budi@example.com", guest_count: 3, status: "pending", message: "Insyaa Allah datang." },
+  { guest_name: "Dewi Lestari", email: "dewi@example.com", guest_count: 1, status: "declined", message: "Maaf, tidak bisa hadir." },
+  { guest_name: "Rizky Hidayat", email: "rizky@example.com", guest_count: 2, status: "confirmed", message: "Selamat menempuh hidup baru!" },
 ];
 
 for (const rsvp of dummyRsvps) {

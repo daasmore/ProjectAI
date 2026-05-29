@@ -5,47 +5,64 @@ import fs from "fs";
 const router = Router();
 
 // Ensure uploads directory exists
-const uploadDir = path.join(process.cwd(), "public", "uploads");
-if (!fs.existsSync(uploadDir)) {
-  fs.mkdirSync(uploadDir, { recursive: true });
+const uploadsDir = path.join(__dirname, "../../uploads");
+if (!fs.existsSync(uploadsDir)) {
+  fs.mkdirSync(uploadsDir, { recursive: true });
 }
 
-// POST /api/v1/upload — Save image URL (for now) or handle base64 upload
-// Body: { "url": "https://..." } or { "base64": "data:image/...", "filename": "photo.jpg" }
+// POST /api/v1/upload — Accept base64 image data and save to disk
 router.post("/", (req: Request, res: Response) => {
-  const { url, base64, filename } = req.body as {
-    url?: string;
-    base64?: string;
-    filename?: string;
-  };
+  try {
+    const { image, filename } = req.body;
 
-  // If URL provided, just return it
-  if (url) {
-    res.json({ success: true, url });
-    return;
-  }
-
-  // If base64 provided, decode and save
-  if (base64 && filename) {
-    try {
-      const base64Data = base64.replace(/^data:image\/\w+;base64,/, "");
-      const buffer = Buffer.from(base64Data, "base64");
-      const safeName = filename.replace(/[^a-zA-Z0-9._-]/g, "_");
-      const timestamp = Date.now();
-      const finalName = `${timestamp}_${safeName}`;
-      const filePath = path.join(uploadDir, finalName);
-
-      fs.writeFileSync(filePath, buffer);
-
-      const publicUrl = `/uploads/${finalName}`;
-      res.json({ success: true, url: publicUrl });
-    } catch {
-      res.status(400).json({ error: "Failed to save image" });
+    if (!image) {
+      res.status(400).json({ error: "No image data provided" });
+      return;
     }
-    return;
-  }
 
-  res.status(400).json({ error: "Provide url or base64+filename" });
+    // Extract base64 data
+    let base64Data: string;
+    let ext = "png";
+
+    if (image.includes(",")) {
+      const parts = image.split(",");
+      const header = parts[0];
+      base64Data = parts[1];
+
+      if (header.includes("jpeg") || header.includes("jpg")) ext = "jpg";
+      else if (header.includes("webp")) ext = "webp";
+      else if (header.includes("png")) ext = "png";
+    } else {
+      base64Data = image;
+    }
+
+    // Generate filename
+    const safeName = filename
+      ? filename.replace(/[^a-zA-Z0-9_-]/g, "_").substring(0, 50)
+      : `upload_${Date.now()}`;
+    const outName = `${safeName}_${Date.now()}.${ext}`;
+    const outPath = path.join(uploadsDir, outName);
+
+    // Write file
+    const buffer = Buffer.from(base64Data, "base64");
+    fs.writeFileSync(outPath, buffer);
+
+    const url = `/uploads/${outName}`;
+    res.json({ url, filename: outName, size: buffer.length });
+  } catch (err) {
+    console.error("Upload error:", err);
+    res.status(500).json({ error: "Upload failed" });
+  }
+});
+
+// Serve uploads statically
+router.use("/files", (req, res, next) => {
+  const filePath = path.join(uploadsDir, req.path);
+  if (fs.existsSync(filePath)) {
+    res.sendFile(filePath);
+  } else {
+    next();
+  }
 });
 
 export default router;
