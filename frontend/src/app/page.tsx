@@ -68,7 +68,7 @@ export default function LandingPage() {
             <div className="hidden md:flex items-center gap-8">
               <Link href="/" className="text-neutral-500 hover:text-neutral-800 transition-colors text-xs tracking-wider uppercase">Beranda</Link>
               <Link href="/invite/sarah-ahmad" className="text-neutral-500 hover:text-neutral-800 transition-colors text-xs tracking-wider uppercase">Undangan</Link>
-              <Link href="/dashboard" className="text-neutral-500 hover:text-neutral-800 transition-colors text-xs tracking-wider uppercase">Dashboard</Link>
+              <Link href="/auth/login" className="text-neutral-500 hover:text-neutral-800 transition-colors text-xs tracking-wider uppercase">Masuk</Link>
             </div>
             <Link href="/invite/sarah-ahmad" className="text-xs tracking-wider uppercase text-neutral-500 hover:text-neutral-800 transition-colors border-b border-neutral-200 hover:border-neutral-400 pb-0.5">
               Lihat Demo
@@ -126,7 +126,7 @@ export default function LandingPage() {
               Lihat Demo Undangan
             </Link>
             <Link
-              href="/dashboard"
+              href="/auth/login"
               className="wedding-btn-secondary text-xs"
             >
               Dashboard

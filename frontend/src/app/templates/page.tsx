@@ -26,9 +26,10 @@ const categoryLabels: Record<string, string> = {
   nature: "🌿 Nature",
   romantic: "💕 Romantic",
   rustic: "🪵 Rustic",
+  indonesia: "🇮🇩 Suku Indonesia",
 };
 
-const categoryOrder = ["classic", "modern", "nature", "romantic", "rustic"];
+const categoryOrder = ["indonesia", "classic", "modern", "nature", "romantic", "rustic"];
 
 export default function TemplateGallery() {
   const [templates, setTemplates] = useState<Template[]>([]);

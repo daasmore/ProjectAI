@@ -93,3 +93,16 @@ for (const guest of dummyGuests) {
 console.log(`✅ Inserted ${dummyGuests.length} manual guest records`);
 
 console.log("\n🎉 Seed complete! Wedding slug: bagus-pertiwi-2026");
+
+// ─── Default User ──────────────────────────────────────────────────────────
+const userId2 = "user-demo-001";
+const existingUser2 = db.prepare("SELECT id FROM users WHERE id = ?").get(userId2);
+if (!existingUser2) {
+  const crypto = require("crypto");
+  const passwordHash = crypto.createHash("sha256").update("demo123" + "wedding-salt-2026").digest("hex");
+  db.prepare(
+    "INSERT INTO users (id, name, email, password_hash, phone) VALUES (?, ?, ?, ?, ?)"
+  ).run(userId2, "Demo User", "demo@wedding.id", passwordHash, "08123456789");
+  db.prepare("UPDATE weddings SET user_id = ? WHERE id = ?").run(userId2, "04bf40ea-153f-4378-a896-8889f56f9dce");
+  console.log("✅ Default user created: demo@wedding.id / demo123");
+}

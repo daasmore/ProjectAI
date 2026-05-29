@@ -43,6 +43,7 @@ db.exec(`
     gmaps_url TEXT,
     gmaps_embed TEXT,
     template_id TEXT DEFAULT '',
+    user_id TEXT DEFAULT '',
     created_at TEXT DEFAULT (datetime('now'))
   )
 `);
@@ -107,7 +108,19 @@ db.exec(`
 
 // ── Indexes ──────────────────────────────────────────────────────────────────
 db.exec(`
-  CREATE INDEX IF NOT EXISTS idx_rsvps_wedding_id ON rsvps(wedding_id);
+  
+  CREATE TABLE IF NOT EXISTS users (
+    id TEXT PRIMARY KEY,
+    name TEXT NOT NULL DEFAULT '',
+    email TEXT UNIQUE NOT NULL,
+    password_hash TEXT NOT NULL,
+    phone TEXT DEFAULT '',
+    role TEXT DEFAULT 'user' CHECK(role IN ('user', 'admin', 'superadmin')),
+    is_active INTEGER DEFAULT 1,
+    created_at TEXT DEFAULT (datetime('now')),
+    updated_at TEXT DEFAULT (datetime('now'))
+  );
+CREATE INDEX IF NOT EXISTS idx_rsvps_wedding_id ON rsvps(wedding_id);
   CREATE INDEX IF NOT EXISTS idx_guests_wedding_id ON guests(wedding_id);
   CREATE INDEX IF NOT EXISTS idx_weddings_slug ON weddings(slug);
   CREATE INDEX IF NOT EXISTS idx_templates_slug ON templates(slug);
@@ -151,6 +164,7 @@ const weddingCols: [string, string, string | null][] = [
   ["gmaps_url", "TEXT", null],
   ["gmaps_embed", "TEXT", null],
   ["template_id", "TEXT", "''"],
+  ["user_id", "TEXT", "''"],
 ];
 weddingCols.forEach(([col, type, def]) => addColumnIfNotExists("weddings", col, type, def));
 
@@ -176,18 +190,22 @@ if (templateCount.cnt === 0) {
     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
   `);
   const templates: string[][] = [
-    ["tmpl_classic_gold", "Classic Gold", "classic-gold", "Elegan dengan tone emas klasik", "classic", "#C9A96E", "#1A1A1A", "#F5F0E8", "Playfair Display", "Lato", "0"],
-    ["tmpl_garden_green", "Garden Fresh", "garden-fresh", "Segar dengan nuansa hijau taman", "nature", "#7D9B76", "#2C3E2D", "#F0F4EF", "Cormorant Garamond", "Lato", "0"],
-    ["tmpl_modern_black", "Modern Black", "modern-black", "Minimalis dengan dominasi hitam", "modern", "#333333", "#000000", "#F8F8F8", "Montserrat", "Inter", "0"],
-    ["tmpl_ocean_blue", "Ocean Blue", "ocean-blue", "Tenang dengan biru laut", "nature", "#4A90D9", "#1A3A5C", "#F0F6FC", "Playfair Display", "Source Sans Pro", "0"],
-    ["tmpl_romantic_pink", "Romantic Blush", "romantic-blush", "Romantis dengan pink lembut", "romantic", "#D4A0A0", "#5C3D3D", "#FDF5F5", "Great Vibes", "Lato", "0"],
-    ["tmpl_sunset_orange", "Sunset Warm", "sunset-warm", "Hangat dengan gradasi sunset", "nature", "#E07B39", "#4A2C17", "#FFF8F0", "Libre Baskerville", "Open Sans", "0"],
-    ["tmpl_royal_purple", "Royal Purple", "royal-purple", "Mewah dengan ungu kerajaan", "classic", "#7B5EA7", "#2D1F40", "#F5F0FA", "Playfair Display", "Lato", "1"],
-    ["tmpl_minimalist_white", "Minimalist White", "minimalist-white", "Sederhana dengan dominasi putih", "modern", "#A8A8A8", "#2A2A2A", "#FFFFFF", "Inter", "Inter", "0"],
-    ["tmpl_champagne", "Champagne", "champagne", "Elegan dengan champagne gold", "classic", "#B8943E", "#2A2218", "#FBF8F0", "Cormorant Garamond", "Lato", "0"],
-    ["tmpl_mint_fresh", "Mint Fresh", "mint-fresh", "Fresh dengan mint dan putih", "nature", "#88B5A0", "#2D4A3E", "#F4FAF7", "DM Serif Display", "DM Sans", "0"],
-    ["tmpl_terracotta", "Terracotta", "terracotta", "Warm dengan warna tanah liat", "rustic", "#C47A5A", "#4A2E1F", "#FBF5F0", "Playfair Display", "Source Sans Pro", "1"],
-    ["tmpl_lavender", "Lavender Dream", "lavender-dream", "Dreamy dengan lavender", "romantic", "#9B8EC4", "#3D3558", "#F7F5FC", "Libre Baskerville", "Lato", "1"],
+    // ═══ Suku Indonesia ═══
+    ["tmpl_melayu", "Melayu", "melayu", "Megah dengan emas dan hijau, ornamen Melayu", "indonesia", "#C9A96E", "#1A3A2A", "#F5F0DC", "Playfair Display", "Lato", "0"],
+    ["tmpl_jawa", "Jawa", "jawa", "Elegan coklat emas, motif parang keraton", "indonesia", "#5C3D2E", "#1A1A1A", "#F5E6D3", "Cormorant Garamond", "Lato", "0"],
+    ["tmpl_sunda", "Sunda", "sunda", "Lembut biru langit, kesan alam Priangan", "indonesia", "#5B8FA8", "#2C4A5E", "#F0F5FA", "DM Serif Display", "DM Sans", "0"],
+    ["tmpl_batak", "Batak", "batak", "Berani merah hitam emas, motif gorga", "indonesia", "#C23B22", "#1A1A1A", "#FFF5F0", "Playfair Display", "Lato", "1"],
+    ["tmpl_minang", "Minangkabau", "minang", "Megah merah emas, terinspirasi rumah gadang", "indonesia", "#8B2500", "#2D1000", "#FFF0DC", "Libre Baskerville", "Open Sans", "0"],
+    ["tmpl_bali", "Bali", "bali", "Sakral emas putih, ornamen ceplok pura", "indonesia", "#B8943E", "#2D2510", "#FFFBF0", "Playfair Display", "Source Sans Pro", "0"],
+    ["tmpl_dayak", "Dayak", "dayak", "Buas kuning merah hitam, motif burung Enggang", "indonesia", "#DAA520", "#1A0A00", "#FFF8E1", "Playfair Display", "Lato", "1"],
+    ["tmpl_bugis", "Bugis-Makassar", "bugis", "Anggun merah emas, terinspirasi phinisi", "indonesia", "#8B1A1A", "#2D0505", "#FFF0E8", "Playfair Display", "Lato", "1"],
+    ["tmpl_aceh", "Aceh", "aceh", "Islami emas hijau, ornamen krawang meukutop", "indonesia", "#2E7D32", "#1B0A00", "#FFF5E0", "Amiri", "Lato", "1"],
+    ["tmpl_papua", "Papua", "papua", "Alam coklat merah kuning, motif asmat tribal", "indonesia", "#8B4513", "#1A0A00", "#FFF0D4", "Playfair Display", "Lato", "1"],
+    // ═══ Universal ═══
+    ["tmpl_minimalist", "Minimalist", "minimalist", "Bersih dan sederhana, dominasi putih", "modern", "#757575", "#1A1A1A", "#FAFAFA", "Inter", "Inter", "0"],
+    ["tmpl_modern_black", "Modern Black", "modern-black", "Glamor hitam emas", "modern", "#333333", "#000000", "#F8F8F8", "Montserrat", "Inter", "0"],
+    ["tmpl_romantic", "Romantic Blush", "romantic", "Romantis pink lembut dan rose gold", "romantic", "#D4A0A0", "#3D2A2A", "#FDF5F5", "Great Vibes", "Lato", "0"],
+    ["tmpl_sunset", "Sunset Warm", "sunset", "Hangat gradasi sunset oranye merah", "nature", "#E07B39", "#4A2C17", "#FFF8F0", "Libre Baskerville", "Open Sans", "0"],
   ];
   const insertMany = db.transaction((items: string[][]) => {
     for (const t of items) insert.run(...t);

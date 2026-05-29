@@ -8,6 +8,7 @@ import guestRoutes from "./routes/guests";
 import uploadRoutes from "./routes/upload";
 import configRoutes from "./routes/config";
 import templateRoutes from "./routes/templates";
+import authRoutes from "./routes/auth";
 
 const app = express();
 const PORT = Number(process.env.PORT) || 4001;
@@ -40,6 +41,7 @@ app.use("/api/v1/rsvp", rsvpRoutes);
 app.use("/api/v1/dashboard", dashboardRoutes);
 app.use("/api/v1/guests", guestRoutes);
 app.use("/api/v1/templates", templateRoutes);
+app.use("/api/v1/auth", authRoutes);
 app.use("/api/v1/upload", uploadRoutes);
 
 // Serve uploaded files statically
