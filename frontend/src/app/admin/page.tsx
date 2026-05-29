@@ -24,11 +24,12 @@ export default function AdminPage() {
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [config, setConfig] = useState<Record<string, unknown> | null>(null);
+  const [previewKey, setPreviewKey] = useState(0);
 
   // Load config on mount
   useEffect(() => {
     setLoading(true);
-    fetch("/api/v1/weddings/d840cc08-20ed-4014-b676-c2b3aae9c76a/config")
+    fetch("/api/v1/weddings/04bf40ea-153f-4378-a896-8889f56f9dce/config")
       .then((r) => r.json())
       .then((data) => setConfig(data))
       .catch(() => null)
@@ -39,7 +40,7 @@ export default function AdminPage() {
     setSaving(true);
     setSaved(false);
     try {
-      const res = await fetch("/api/v1/weddings/d840cc08-20ed-4014-b676-c2b3aae9c76a/config", {
+      const res = await fetch("/api/v1/weddings/04bf40ea-153f-4378-a896-8889f56f9dce/config", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(sectionData),
@@ -48,6 +49,8 @@ export default function AdminPage() {
       const result = await res.json();
       setConfig(result.wedding);
       setSaved(true);
+      // Trigger preview refresh by updating a key
+      setPreviewKey((k) => k + 1);
       setTimeout(() => setSaved(false), 3000);
     } catch {
       // silently fail for now
@@ -137,7 +140,7 @@ export default function AdminPage() {
 
       {/* Right: Live Preview (desktop only) */}
       <div className="hidden lg:block w-80 shrink-0">
-        <LivePreview slug="sarah-ahmad" config={config} />
+        <LivePreview slug="sarah-ahmad" config={config} refreshKey={previewKey} />
       </div>
     </div>
   );

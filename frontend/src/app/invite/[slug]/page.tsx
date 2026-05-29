@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Heart,
@@ -32,9 +32,47 @@ function formatTime(t: string) {
 }
 
 export default function InvitePage() {
-  const couple = mockCouple;
+  const [couple, setCouple] = useState(mockCouple);
+  const [loading, setLoading] = useState(true);
   const [isOpened, setIsOpened] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
+
+  useEffect(() => {
+    fetch("/api/v1/weddings/04bf40ea-153f-4378-a896-8889f56f9dce/config")
+      .then((r) => r.json())
+      .then((data) => {
+        if (data.bride_name) {
+          setCouple({
+            brideName: data.bride_name || mockCouple.brideName,
+            groomName: data.groom_name || mockCouple.groomName,
+            date: data.wedding_date || mockCouple.date,
+            venue: data.venue || mockCouple.venue,
+            venueAddress: data.venue_address || mockCouple.venueAddress,
+            akadTime: data.akad_time || mockCouple.akadTime,
+            resepsiTime: data.resepsi_time || mockCouple.resepsiTime,
+            quote: data.quote || mockCouple.quote,
+            quoteSource: data.quote_source || mockCouple.quoteSource,
+            brideParents: data.bride_parents || mockCouple.brideParents,
+            groomParents: data.groom_parents || mockCouple.groomParents,
+            slug: mockCouple.slug,
+            gmapsUrl: mockCouple.gmapsUrl,
+            gmapsEmbed: mockCouple.gmapsEmbed,
+            heroImage: data.hero_image || mockCouple.heroImage,
+            coupleImage: data.photo_url || mockCouple.coupleImage,
+          });
+        }
+      })
+      .catch(() => null)
+      .finally(() => setLoading(false));
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-white flex items-center justify-center">
+        <div className="text-neutral-300 text-sm">Loading...</div>
+      </div>
+    );
+  }
 
   const weddingDate = new Date(couple.date);
   const now = new Date();

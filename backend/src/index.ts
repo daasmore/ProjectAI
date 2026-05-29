@@ -7,8 +7,6 @@ import dashboardRoutes from "./routes/dashboard";
 import guestRoutes from "./routes/guests";
 import uploadRoutes from "./routes/upload";
 import configRoutes from "./routes/config";
-import configRoutes from "./routes/config";
-import uploadRoutes from "./routes/upload";
 
 const app = express();
 const PORT = Number(process.env.PORT) || 4001;
@@ -35,17 +33,15 @@ app.get("/health", (_req, res) => {
 });
 
 // ─── Routes ──────────────────────────────────────────────────────────────────
+app.use("/api/v1/weddings", configRoutes);
 app.use("/api/v1/weddings", weddingRoutes);
 app.use("/api/v1/rsvp", rsvpRoutes);
 app.use("/api/v1/dashboard", dashboardRoutes);
 app.use("/api/v1/guests", guestRoutes);
 app.use("/api/v1/upload", uploadRoutes);
-app.use("/api/v1/weddings", configRoutes);
 
 // Serve uploaded files statically
 app.use("/uploads", express.static(path.join(__dirname, "../uploads")));
-app.use("/api/v1/weddings", configRoutes);
-app.use("/api/v1", uploadRoutes);
 
 // ─── 404 ─────────────────────────────────────────────────────────────────────
 app.use((_req, res) => {

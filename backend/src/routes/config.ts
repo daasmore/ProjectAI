@@ -7,6 +7,12 @@ const router = Router();
 const ALLOWED_COLUMNS = [
   "bride_name", "groom_name", "wedding_date", "venue", "venue_address",
   "theme", "photo_url", "description",
+  "akad_time", "resepsi_time", "quote", "quote_source",
+  "bride_parents", "groom_parents",
+  "hero_image", "bride_photo", "groom_photo",
+  "gallery_1", "gallery_2", "gallery_3", "gallery_4", "gallery_5", "gallery_6",
+  "music_url", "font_family", "primary_color", "secondary_color", "accent_color",
+  "gmaps_url", "gmaps_embed",
 ];
 
 // PUT /api/v1/weddings/:id/config — Save wedding config
@@ -47,7 +53,7 @@ router.get("/:id/config", (req: Request, res: Response) => {
   const wedding = db.prepare("SELECT * FROM weddings WHERE id = ?").get(id) as Record<string, unknown> | undefined;
 
   if (!wedding) {
-    // Return default config even if no DB record
+    // Return default config
     res.json({
       bride_name: "Sarah Putri",
       groom_name: "Ahmad Rizky",
@@ -57,6 +63,27 @@ router.get("/:id/config", (req: Request, res: Response) => {
       theme: "minimalist",
       photo_url: "https://images.unsplash.com/photo-1519741497674-611481863552?w=800",
       description: "Dengan penuh sukacita, kami mengundang Bapak/Ibu/Sahabat.",
+      akad_time: "08:00 WIB",
+      resepsi_time: "11:00 - 14:00 WIB",
+      quote: "Dan di antara tanda-tanda (kebesaran)-Nya ialah Dia menciptakan pasangan-pasangan untukmu dari jenismu sendiri.",
+      quote_source: "QS. Ar-Rum: 21",
+      bride_parents: "Bapak ... & Ibu ...",
+      groom_parents: "Bapak ... & Ibu ...",
+      hero_image: "https://images.unsplash.com/photo-1519741497674-611481863552?w=1920&q=80",
+      bride_photo: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&q=80",
+      groom_photo: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&q=80",
+      gallery_1: "https://images.unsplash.com/photo-1606800052052-a08af7148866?w=600&q=80",
+      gallery_2: "https://images.unsplash.com/photo-1583939003579-730e3918a45a?w=600&q=80",
+      gallery_3: "https://images.unsplash.com/photo-1522673607200-164d1b6ce486?w=600&q=80",
+      gallery_4: "https://images.unsplash.com/photo-1529636798458-92182e662485?w=600&q=80",
+      gallery_5: "https://images.unsplash.com/photo-1511285560929-80b456fea0bc?w=600&q=80",
+      gallery_6: "https://images.unsplash.com/photo-1465495976277-4387d4b0b4c6?w=600&q=80",
+      font_family: "serif",
+      primary_color: "#1a1a1a",
+      secondary_color: "#f5f5f5",
+      accent_color: "#d4d4d4",
+      gmaps_url: "https://maps.google.com/?q=Jakarta",
+      gmaps_embed: "",
     });
     return;
   }

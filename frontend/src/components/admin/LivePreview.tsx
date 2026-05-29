@@ -1,16 +1,22 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ExternalLink, RefreshCw, Smartphone, Monitor } from "lucide-react";
 
 interface Props {
   slug: string;
   config: Record<string, unknown> | null;
+  refreshKey?: number;
 }
 
-export default function LivePreview({ slug, config }: Props) {
+export default function LivePreview({ slug, config, refreshKey = 0 }: Props) {
   const [device, setDevice] = useState<"mobile" | "desktop">("mobile");
-  const [refreshKey, setRefreshKey] = useState(0);
+  const [iframeKey, setIframeKey] = useState(0);
+
+  useEffect(() => {
+    // Refresh iframe when refreshKey changes
+    setIframeKey((k) => k + 1);
+  }, [refreshKey]);
 
   return (
     <div className="sticky top-14">
@@ -31,7 +37,7 @@ export default function LivePreview({ slug, config }: Props) {
               <Monitor className="w-3.5 h-3.5" />
             </button>
             <button
-              onClick={() => setRefreshKey((k) => k + 1)}
+              onClick={() => setIframeKey((k) => k + 1)}
               className="p-1.5 text-neutral-300 hover:text-neutral-600 transition-colors"
             >
               <RefreshCw className="w-3.5 h-3.5" />
@@ -50,7 +56,7 @@ export default function LivePreview({ slug, config }: Props) {
           device === "mobile" ? "w-[280px] h-[500px]" : "w-full h-[500px]"
         }`}>
           <iframe
-            key={refreshKey}
+            key={iframeKey}
             src={`/invite/${slug}`}
             className="w-full h-full border-0"
             title="Preview"
